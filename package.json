@@ -16,7 +16,8 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "examples": "./test/support/example_runner.sh",
-    "examples-typecheck": "tsc --project examples"
+    "examples-typecheck": "tsc --project examples",
+    "src-typecheck": "tsc --build src"
   },
   "repository": {
     "type": "git",
