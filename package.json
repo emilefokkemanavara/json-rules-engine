@@ -10,12 +10,13 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "test": "vitest --typecheck",
+    "test": "vitest --run",
     "lint": "eslint",
     "format": "prettier -w .",
     "build": "tsup",
     "watch": "tsup --watch",
-    "examples": "./test/support/example_runner.sh"
+    "examples": "./test/support/example_runner.sh",
+    "examples-typecheck": "tsc --project examples"
   },
   "repository": {
     "type": "git",
