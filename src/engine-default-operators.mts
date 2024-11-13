@@ -1,6 +1,7 @@
+import {Operator as OperatorType} from '../types'
 import Operator from "./operator.mjs";
 
-const Operators = [];
+const Operators: OperatorType[] = [];
 Operators.push(new Operator("equal", (a, b) => a === b));
 Operators.push(new Operator("notEqual", (a, b) => a !== b));
 Operators.push(new Operator("in", (a, b) => b.indexOf(a) > -1));
