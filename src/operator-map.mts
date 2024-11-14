@@ -1,8 +1,11 @@
-import Operator from "./operator.mjs";
-import OperatorDecorator from "./operator-decorator.mjs";
+import { OperatorDecoratorEvaluator, OperatorEvaluator} from '../types'
+import Operator, { InternalOperatorType } from "./operator.mjs";
+import OperatorDecorator, { InternalOperatorDecoratorType } from "./operator-decorator.mjs";
 import debug from "./debug.mjs";
 
 export default class OperatorMap {
+  operators: Map<string, InternalOperatorType>
+  decorators: Map<string, InternalOperatorDecoratorType>
   constructor() {
     this.operators = new Map();
     this.decorators = new Map();
@@ -13,12 +16,14 @@ export default class OperatorMap {
    * @param {string}   operatorOrName - operator identifier within the condition; i.e. instead of 'equals', 'greaterThan', etc
    * @param {function(factValue, jsonValue)} callback - the method to execute when the operator is encountered.
    */
-  addOperator(operatorOrName, cb) {
+  addOperator<A, B>(operatorOrName: string | Operator, cb?: OperatorEvaluator<A, B>): void {
     let operator;
     if (operatorOrName instanceof Operator) {
       operator = operatorOrName;
-    } else {
+    } else if (cb) {
       operator = new Operator(operatorOrName, cb);
+    } else {
+      throw new Error("Missing operator callback");
     }
     debug("operatorMap::addOperator", { name: operator.name });
     this.operators.set(operator.name, operator);
@@ -29,12 +34,12 @@ export default class OperatorMap {
    * @param {string}   operatorOrName - operator identifier within the condition; i.e. instead of 'equals', 'greaterThan', etc
    * @param {function(factValue, jsonValue)} callback - the method to execute when the operator is encountered.
    */
-  removeOperator(operatorOrName) {
-    let operatorName;
-    if (operatorOrName instanceof Operator) {
-      operatorName = operatorOrName.name;
-    } else {
+  removeOperator(operatorOrName: InternalOperatorType | string): boolean {
+    let operatorName: string;
+    if (typeof operatorOrName === 'string') {
       operatorName = operatorOrName;
+    } else {
+      operatorName = operatorOrName.name;
     }
 
     // Delete all the operators that end in :operatorName these
@@ -55,12 +60,16 @@ export default class OperatorMap {
    * @param {string}   decoratorOrName - decorator identifier within the condition; i.e. instead of 'everyFact', 'someValue', etc
    * @param {function(factValue, jsonValue, next)} callback - the method to execute when the decorator is encountered.
    */
-  addOperatorDecorator(decoratorOrName, cb) {
+  addOperatorDecorator<A, B, NextA, NextB>(
+    decoratorOrName: string | OperatorDecorator,
+    cb?: OperatorDecoratorEvaluator<A, B, NextA, NextB>): void {
     let decorator;
     if (decoratorOrName instanceof OperatorDecorator) {
       decorator = decoratorOrName;
-    } else {
+    } else if (cb) {
       decorator = new OperatorDecorator(decoratorOrName, cb);
+    } else {
+      throw new Error("Missing decorator callback");
     }
     debug("operatorMap::addOperatorDecorator", { name: decorator.name });
     this.decorators.set(decorator.name, decorator);
@@ -70,12 +79,12 @@ export default class OperatorMap {
    * Remove a custom operator decorator
    * @param {string}   decoratorOrName - decorator identifier within the condition; i.e. instead of 'everyFact', 'someValue', etc
    */
-  removeOperatorDecorator(decoratorOrName) {
-    let decoratorName;
-    if (decoratorOrName instanceof OperatorDecorator) {
-      decoratorName = decoratorOrName.name;
-    } else {
+  removeOperatorDecorator(decoratorOrName: InternalOperatorDecoratorType | string): boolean {
+    let decoratorName: string;
+    if (typeof decoratorOrName === 'string') {
       decoratorName = decoratorOrName;
+    } else {
+      decoratorName = decoratorOrName.name;
     }
 
     // Delete all the operators that include decoratorName: these
@@ -96,7 +105,7 @@ export default class OperatorMap {
    * @param {string} name - the name of the operator including any decorators
    * @returns an operator or null
    */
-  get(name) {
+  get(name: string): InternalOperatorType | null {
     const decorators = [];
     let opName = name;
     // while we don't already have this operator
@@ -122,6 +131,9 @@ export default class OperatorMap {
     }
 
     let op = this.operators.get(opName);
+    if(!op){
+      return null;
+    }
     // apply all the decorators
     for (let i = 0; i < decorators.length; i++) {
       op = decorators[i].decorate(op);

@@ -1,11 +1,20 @@
-import { OperatorDecoratorEvaluator, OperatorDecorator as OperatorDecoratorType } from '../types'
+import { OperatorDecoratorEvaluator, OperatorDecorator as OperatorDecoratorType, Operator as OperatorType } from '../types'
 import Operator from "./operator.mjs";
+
+export interface InternalOperatorDecoratorType<
+  TFactValue = unknown,
+  TJsonValue = unknown,
+  TNextFactValue = unknown,
+  TNextJsonValue = unknown
+> extends OperatorDecoratorType<TFactValue, TJsonValue, TNextFactValue, TNextJsonValue>{
+  decorate(operator: OperatorType): OperatorType
+}
 
 export default class OperatorDecorator<
   TFactValue = unknown,
   TJsonValue = unknown,
   TNextFactValue = unknown,
-  TNextJsonValue = unknown> implements OperatorDecoratorType<TFactValue, TJsonValue, TNextFactValue, TNextJsonValue> {
+  TNextJsonValue = unknown> implements InternalOperatorDecoratorType<TFactValue, TJsonValue, TNextFactValue, TNextJsonValue> {
   name: string
   private cb: OperatorDecoratorEvaluator<TFactValue, TJsonValue, TNextFactValue, TNextJsonValue>
   private factValueValidator: (factValue: TFactValue) => boolean

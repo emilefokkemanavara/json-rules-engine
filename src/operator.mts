@@ -1,6 +1,9 @@
 import { OperatorEvaluator, Operator as OperatorType } from '../types'
 
-export default class Operator<TFactValue = unknown, TJsonValue = unknown> implements OperatorType<TFactValue, TJsonValue> {
+export interface InternalOperatorType<TFactValue = unknown, TJsonValue = unknown> extends OperatorType<TFactValue, TJsonValue> {
+  name: string
+}
+export default class Operator<TFactValue = unknown, TJsonValue = unknown> implements InternalOperatorType<TFactValue, TJsonValue> {
   name: string
   private factValueValidator: (value: TFactValue) => boolean
   private cb: OperatorEvaluator<TFactValue, TJsonValue>

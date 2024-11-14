@@ -1,7 +1,6 @@
-import { OperatorDecorator as OperatorDecoratorType } from '../types'
-import OperatorDecorator from "./operator-decorator.mjs";
+import OperatorDecorator, { InternalOperatorDecoratorType } from "./operator-decorator.mjs";
 
-const OperatorDecorators: OperatorDecoratorType[] = [];
+const OperatorDecorators: InternalOperatorDecoratorType[] = [];
 
 OperatorDecorators.push(
   new OperatorDecorator<unknown[], unknown>(
