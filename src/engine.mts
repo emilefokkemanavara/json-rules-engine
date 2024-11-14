@@ -389,7 +389,7 @@ class Engine extends EventEmitter implements EngineType {
   }
 
   on<T = Event>(eventName: string, handler: EventHandler<T>): this{
-    this.on(eventName, handler);
+    super.on(eventName, handler);
     return this;
   }
 }
