@@ -1,6 +1,14 @@
+import { OperatorDecoratorEvaluator, OperatorDecorator as OperatorDecoratorType } from '../types'
 import Operator from "./operator.mjs";
 
-export default class OperatorDecorator {
+export default class OperatorDecorator<
+  TFactValue = unknown,
+  TJsonValue = unknown,
+  TNextFactValue = unknown,
+  TNextJsonValue = unknown> implements OperatorDecoratorType<TFactValue, TJsonValue, TNextFactValue, TNextJsonValue> {
+  name: string
+  private cb: OperatorDecoratorEvaluator<TFactValue, TJsonValue, TNextFactValue, TNextJsonValue>
+  private factValueValidator: (factValue: TFactValue) => boolean
   /**
    * Constructor
    * @param {string}   name - decorator identifier
@@ -8,13 +16,15 @@ export default class OperatorDecorator {
    * @param {function}  [factValueValidator] - optional validator for asserting the data type of the fact
    * @returns {OperatorDecorator} - instance
    */
-  constructor(name, cb, factValueValidator) {
-    this.name = String(name);
-    if (!name) throw new Error("Missing decorator name");
-    if (typeof cb !== "function") throw new Error("Missing decorator callback");
-    this.cb = cb;
-    this.factValueValidator = factValueValidator;
-    if (!this.factValueValidator) this.factValueValidator = () => true;
+  constructor(
+    name: string,
+    cb: OperatorDecoratorEvaluator<TFactValue, TJsonValue, TNextFactValue, TNextJsonValue>,
+    factValueValidator?: (factValue: TFactValue) => boolean) {
+      this.name = String(name);
+      if (!name) throw new Error("Missing decorator name");
+      if (typeof cb !== "function") throw new Error("Missing decorator callback");
+      this.cb = cb;
+      this.factValueValidator = factValueValidator || (() => true);
   }
 
   /**
@@ -22,9 +32,9 @@ export default class OperatorDecorator {
    * @param   {Operator} operator - fact result
    * @returns {Operator} - whether the values pass the operator test
    */
-  decorate(operator) {
+  decorate(operator: Operator<TNextFactValue, TNextJsonValue>): Operator<TFactValue, TJsonValue> {
     const next = operator.evaluate.bind(operator);
-    return new Operator(
+    return new Operator<TFactValue, TJsonValue>(
       `${this.name}:${operator.name}`,
       (factValue, jsonValue) => {
         return this.cb(factValue, jsonValue, next);
