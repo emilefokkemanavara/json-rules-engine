@@ -17,8 +17,21 @@ function isConditionReference(properties: NestedCondition): properties is Condit
   return (properties as ConditionReference).condition !== undefined;
 }
 
+export interface StringifyableConditionResult {
+  toJSON(): string
+  toJSON<T extends boolean>(
+    stringify: T
+  ): T extends true ? string : TopLevelConditionResultSerializable | ConditionPropertiesResult
+}
 
-export default class Condition {
+export interface StringifyableTopLevelConditionResult {
+  toJSON(): string
+  toJSON<T extends boolean>(
+    stringify: T
+  ): T extends true ? string : TopLevelConditionResultSerializable
+}
+
+export default class Condition implements StringifyableConditionResult {
   fact?: string;
   operator?: string;
   value?: unknown;
@@ -130,6 +143,7 @@ export default class Condition {
    * @param   {Boolean} stringify - whether to return as a json string
    * @returns {string,object} json string or json-friendly object
    */
+  toJSON(): string
   toJSON(stringify = true): TopLevelConditionResultSerializable | ConditionPropertiesResult | string {
     const props = this.toSerializable();
     if (stringify) {

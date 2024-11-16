@@ -1,7 +1,14 @@
+import { RuleResult as RuleResultType, TopLevelConditionResult, Event, RuleResultSerializable } from '../types'
 import deepClone from "clone";
+import { StringifyableTopLevelConditionResult } from './condition.mjs';
 
-export default class RuleResult {
-  constructor(conditions, event, priority, name) {
+export default class RuleResult implements RuleResultType{
+  name: string
+  conditions: TopLevelConditionResult & StringifyableTopLevelConditionResult;
+  event: Event
+  priority: number
+  result: unknown
+  constructor(conditions: TopLevelConditionResult & StringifyableTopLevelConditionResult, event: Event, priority: number, name: string) {
     this.conditions = deepClone(conditions);
     this.event = deepClone(event);
     this.priority = deepClone(priority);
@@ -9,7 +16,7 @@ export default class RuleResult {
     this.result = null;
   }
 
-  setResult(result) {
+  setResult(result: unknown): void {
     this.result = result;
   }
 
@@ -30,8 +37,9 @@ export default class RuleResult {
     return Promise.resolve();
   }
 
-  toJSON(stringify = true) {
-    const props = {
+  toJSON(): string
+  toJSON(stringify = true): RuleResultSerializable | string {
+    const props: RuleResultSerializable = {
       conditions: this.conditions.toJSON(false),
       event: this.event,
       priority: this.priority,

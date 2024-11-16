@@ -3,8 +3,10 @@ import RuleResult from "./rule-result.mjs";
 import debug from "./debug.mjs";
 import deepClone from "clone";
 import EventEmitter from "eventemitter2";
+import { RuleProperties, Rule as RuleType } from "../types";
 
-class Rule extends EventEmitter {
+class Rule extends EventEmitter implements RuleType {
+  
   /**
    * returns a new Rule instance
    * @param {object,string} options, or json string that can be parsed into options
@@ -16,10 +18,13 @@ class Rule extends EventEmitter {
    * @param {any} options.name - identifier for a particular rule, particularly valuable in RuleResult output
    * @return {Rule} instance
    */
-  constructor(options) {
+  constructor(initialOptions: RuleProperties | string) {
     super();
-    if (typeof options === "string") {
-      options = JSON.parse(options);
+    let options: RuleProperties
+    if (typeof initialOptions === "string") {
+      options = JSON.parse(initialOptions);
+    }else{
+      options = initialOptions;
     }
     if (options && options.conditions) {
       this.setConditions(options.conditions);
@@ -30,7 +35,7 @@ class Rule extends EventEmitter {
     if (options && options.onFailure) {
       this.on("failure", options.onFailure);
     }
-    if (options && (options.name || options.name === 0)) {
+    if (options && (options.name || options.name as unknown as number === 0)) {
       this.setName(options.name);
     }
 
@@ -45,7 +50,7 @@ class Rule extends EventEmitter {
    * Sets the priority of the rule
    * @param {integer} priority (>=1) - increasing the priority causes the rule to be run prior to other rules
    */
-  setPriority(priority) {
+  setPriority(priority: number): this {
     priority = parseInt(priority, 10);
     if (priority <= 0) throw new Error("Priority must be greater than zero");
     this.priority = priority;
