@@ -1,6 +1,7 @@
 export class UndefinedFactError extends Error {
-  constructor(...props) {
-    super(...props);
+  code: string
+  constructor(message?: string, options?: ErrorOptions) {
+    super(message, options);
     this.code = "UNDEFINED_FACT";
   }
 }
