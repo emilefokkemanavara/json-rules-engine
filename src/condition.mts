@@ -1,28 +1,70 @@
+import { AllConditions, AnyConditions, ConditionPropertiesResult, ConditionReference, NestedCondition, NotConditions, TopLevelConditionResultSerializable } from "../types";
 import debug from "./debug.mjs";
 
+function isAll(properties: NestedCondition): properties is AllConditions{
+  return (properties as AllConditions).all !== undefined;
+}
+
+function isAny(properties: NestedCondition): properties is AnyConditions{
+  return (properties as AnyConditions).any !== undefined;
+}
+
+function isNot(properties: NestedCondition): properties is NotConditions{
+  return (properties as NotConditions).not !== undefined;
+}
+
+function isConditionReference(properties: NestedCondition): properties is ConditionReference{
+  return (properties as ConditionReference).condition !== undefined;
+}
+
+
 export default class Condition {
-  constructor(properties) {
+  fact?: string;
+  operator?: string;
+  value?: unknown;
+  path?: string;
+  priority?: number;
+  params?: Record<string, unknown>;
+  name?: string;
+  any?: Condition[]
+  all?: Condition[]
+  not?: Condition
+  result?: boolean
+  factResult?: unknown
+  condition?: string
+  constructor(properties: NestedCondition) {
     if (!properties) throw new Error("Condition: constructor options required");
     const booleanOperator = Condition.booleanOperator(properties);
     Object.assign(this, properties);
-    if (booleanOperator) {
-      const subConditions = properties[booleanOperator];
-      const subConditionsIsArray = Array.isArray(subConditions);
-      if (booleanOperator !== "not" && !subConditionsIsArray) {
-        throw new Error(`"${booleanOperator}" must be an array`);
+    if(isAny(properties)){
+      const subConditions = properties.any;
+      if (!Array.isArray(subConditions)) {
+        throw new Error(`"any" must be an array`);
       }
-      if (booleanOperator === "not" && subConditionsIsArray) {
-        throw new Error(`"${booleanOperator}" cannot be an array`);
+      this.operator = 'any';
+      // boolean conditions always have a priority; default 1
+      this.priority = parseInt(properties.priority as unknown as string, 10) || 1;
+      this.any = subConditions.map((c) => new Condition(c));
+    } else if (isAll(properties)){
+      const subConditions = properties.all;
+      if (!Array.isArray(subConditions)) {
+        throw new Error(`"all" must be an array`);
+      }
+      this.operator = 'all';
+      // boolean conditions always have a priority; default 1
+      this.priority = parseInt(properties.priority as unknown as string, 10) || 1;
+      this.all = subConditions.map((c) => new Condition(c));
+    }
+    else if (isNot(properties)) {
+      const subConditions = properties.not;
+      if (Array.isArray(subConditions)) {
+        throw new Error(`"not" cannot be an array`);
       }
       this.operator = booleanOperator;
       // boolean conditions always have a priority; default 1
-      this.priority = parseInt(properties.priority, 10) || 1;
-      if (subConditionsIsArray) {
-        this[booleanOperator] = subConditions.map((c) => new Condition(c));
-      } else {
-        this[booleanOperator] = new Condition(subConditions);
-      }
-    } else if (!Object.prototype.hasOwnProperty.call(properties, "condition")) {
+      this.priority = parseInt(properties.priority as unknown as string, 10) || 1;
+      this.not = new Condition(subConditions);
+    } else if (!isConditionReference(properties)) {
       if (!Object.prototype.hasOwnProperty.call(properties, "fact")) {
         throw new Error('Condition: constructor "fact" property required');
       }
@@ -36,8 +78,50 @@ export default class Condition {
       // a non-boolean condition does not have a priority by default. this allows
       // priority to be dictated by the fact definition
       if (Object.prototype.hasOwnProperty.call(properties, "priority")) {
-        properties.priority = parseInt(properties.priority, 10);
+        properties.priority = parseInt(properties.priority as unknown as string, 10);
       }
+    }
+  }
+
+  private toSerializable(): TopLevelConditionResultSerializable | ConditionPropertiesResult{
+    if(isAny(this as NestedCondition)){
+      return {
+        priority: this.priority,
+        name: this.name,
+        any: (this.any || []).map(c => c.toSerializable())
+      }
+    }
+    if(isAll(this as NestedCondition)){
+      return {
+        priority: this.priority,
+        name: this.name,
+        all: (this.all || []).map(c => c.toSerializable())
+      }
+    }
+    if(isNot(this as NestedCondition)){
+      return {
+        priority: this.priority,
+        name: this.name,
+        not: this.not!.toSerializable()
+      }
+    }
+    if(isConditionReference(this as NestedCondition)){
+      return {
+        name: this.name,
+        priority: this.priority,
+        condition: this.condition!
+      }
+    }
+    return {
+      priority: this.priority,
+      name: this.name,
+      operator: this.operator!,
+      value: this.value,
+      fact: this.fact!,
+      factResult: this.factResult,
+      result: this.result,
+      params: this.params,
+      path: this.path
     }
   }
 
@@ -46,40 +130,8 @@ export default class Condition {
    * @param   {Boolean} stringify - whether to return as a json string
    * @returns {string,object} json string or json-friendly object
    */
-  toJSON(stringify = true) {
-    const props = {};
-    if (this.priority) {
-      props.priority = this.priority;
-    }
-    if (this.name) {
-      props.name = this.name;
-    }
-    const oper = Condition.booleanOperator(this);
-    if (oper) {
-      if (Array.isArray(this[oper])) {
-        props[oper] = this[oper].map((c) => c.toJSON(false));
-      } else {
-        props[oper] = this[oper].toJSON(false);
-      }
-    } else if (this.isConditionReference()) {
-      props.condition = this.condition;
-    } else {
-      props.operator = this.operator;
-      props.value = this.value;
-      props.fact = this.fact;
-      if (this.factResult !== undefined) {
-        props.factResult = this.factResult;
-      }
-      if (this.result !== undefined) {
-        props.result = this.result;
-      }
-      if (this.params) {
-        props.params = this.params;
-      }
-      if (this.path) {
-        props.path = this.path;
-      }
-    }
+  toJSON(stringify = true): TopLevelConditionResultSerializable | ConditionPropertiesResult | string {
+    const props = this.toSerializable();
     if (stringify) {
       return JSON.stringify(props);
     }
@@ -132,12 +184,12 @@ export default class Condition {
    * If the condition is not a boolean condition, the result will be 'undefined'
    * @return {string 'all', 'any', or 'not'}
    */
-  static booleanOperator(condition) {
-    if (Object.prototype.hasOwnProperty.call(condition, "any")) {
+  static booleanOperator(condition: NestedCondition) {
+    if (isAny(condition)) {
       return "any";
-    } else if (Object.prototype.hasOwnProperty.call(condition, "all")) {
+    } else if (isAll(condition)) {
       return "all";
-    } else if (Object.prototype.hasOwnProperty.call(condition, "not")) {
+    } else if (isNot(condition)) {
       return "not";
     }
   }
@@ -148,7 +200,7 @@ export default class Condition {
    * @returns {string,undefined} - 'any', 'all', 'not' or undefined (if not a boolean condition)
    */
   booleanOperator() {
-    return Condition.booleanOperator(this);
+    return Condition.booleanOperator(this as NestedCondition);
   }
 
   /**
@@ -156,7 +208,7 @@ export default class Condition {
    * @returns {Boolean}
    */
   isBooleanOperator() {
-    return Condition.booleanOperator(this) !== undefined;
+    return Condition.booleanOperator(this as NestedCondition) !== undefined;
   }
 
   /**
@@ -164,6 +216,6 @@ export default class Condition {
    * @returns {Boolean}
    */
   isConditionReference() {
-    return Object.prototype.hasOwnProperty.call(this, "condition");
+    return this.condition !== undefined;
   }
 }
