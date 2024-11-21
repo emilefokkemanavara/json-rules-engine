@@ -234,6 +234,7 @@ class Rule extends EventEmitter implements RuleType {
           .then((evaluationResult) => {
             const passes = evaluationResult.result;
             condition.factResult = evaluationResult.leftHandSideValue;
+            condition.valueResult = evaluationResult.rightHandSideValue;
             condition.result = passes;
             return passes;
           });

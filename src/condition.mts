@@ -44,6 +44,7 @@ export default class Condition implements StringifyableConditionResult {
   not?: Condition
   result?: boolean
   factResult?: unknown
+  valueResult?: unknown
   condition?: string
   constructor(properties: NestedCondition) {
     if (!properties) throw new Error("Condition: constructor options required");
@@ -132,6 +133,7 @@ export default class Condition implements StringifyableConditionResult {
       value: this.value,
       fact: this.fact!,
       factResult: this.factResult,
+      valueResult: this.valueResult,
       result: this.result,
       params: this.params,
       path: this.path
