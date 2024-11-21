@@ -6,7 +6,8 @@ import EventEmitter from "eventemitter2";
 import { RuleProperties, Rule as RuleType } from "../types";
 
 class Rule extends EventEmitter implements RuleType {
-  
+  name?: string
+  priority: number
   /**
    * returns a new Rule instance
    * @param {object,string} options, or json string that can be parsed into options
@@ -18,9 +19,9 @@ class Rule extends EventEmitter implements RuleType {
    * @param {any} options.name - identifier for a particular rule, particularly valuable in RuleResult output
    * @return {Rule} instance
    */
-  constructor(initialOptions: RuleProperties | string) {
+  constructor(initialOptions?: RuleProperties | string) {
     super();
-    let options: RuleProperties
+    let options: RuleProperties | undefined;
     if (typeof initialOptions === "string") {
       options = JSON.parse(initialOptions);
     }else{
@@ -40,7 +41,7 @@ class Rule extends EventEmitter implements RuleType {
     }
 
     const priority = (options && options.priority) || 1;
-    this.setPriority(priority);
+    this.priority = priority;
 
     const event = (options && options.event) || { type: "unknown" };
     this.setEvent(event);
@@ -51,7 +52,7 @@ class Rule extends EventEmitter implements RuleType {
    * @param {integer} priority (>=1) - increasing the priority causes the rule to be run prior to other rules
    */
   setPriority(priority: number): this {
-    priority = parseInt(priority, 10);
+    priority = parseInt(priority as unknown as string, 10);
     if (priority <= 0) throw new Error("Priority must be greater than zero");
     this.priority = priority;
     return this;
