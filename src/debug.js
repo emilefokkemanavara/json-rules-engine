@@ -1,4 +1,3 @@
-
 function createDebug () {
   try {
     if ((typeof process !== 'undefined' && process.env && process.env.DEBUG && process.env.DEBUG.match(/json-rules-engine/)) ||
