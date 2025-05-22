@@ -13,7 +13,7 @@
     "lint": "standard --verbose --env mocha | snazzy || true",
     "lint:fix": "standard --fix --env mocha",
     "prepublishOnly": "npm run build",
-    "build": "babel --stage 1 -d dist/ src/",
+    "build": "babel -d dist/ src/",
     "watch": "babel --watch --stage 1 -d dist/ src",
     "examples": "./test/support/example_runner.sh"
   },
@@ -27,7 +27,7 @@
     "rules engine"
   ],
   "standard": {
-    "parser": "babel-eslint",
+    "parser": "@babel/eslint-parser",
     "ignore": [
       "/dist",
       "/examples/node_modules"
@@ -47,8 +47,7 @@
   },
   "mocha": {
     "require": [
-      "babel-core/register",
-      "babel-polyfill"
+      "@babel/register"
     ],
     "file": "./test/support/bootstrap.js",
     "checkLeaks": true,
@@ -67,14 +66,11 @@
   },
   "homepage": "https://github.com/cachecontrol/json-rules-engine",
   "devDependencies": {
-    "babel-cli": "6.26.0",
-    "babel-core": "6.26.3",
-    "babel-eslint": "10.1.0",
-    "babel-loader": "8.2.2",
-    "babel-polyfill": "6.26.0",
-    "babel-preset-es2015": "~6.24.1",
-    "babel-preset-stage-0": "~6.24.1",
-    "babel-register": "6.26.0",
+    "@babel/cli": "^7.27.2",
+    "@babel/eslint-parser": "^7.27.1",
+    "@babel/plugin-proposal-function-bind": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/register": "^7.27.1",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "colors": "~1.4.0",
@@ -85,7 +81,7 @@
     "sinon": "^11.1.1",
     "sinon-chai": "^3.7.0",
     "snazzy": "^9.0.0",
-    "standard": "^16.0.3",
+    "standard": "^17.1.2",
     "tsd": "^0.17.0"
   },
   "dependencies": {
