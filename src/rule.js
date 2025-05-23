@@ -9,7 +9,7 @@ import EventEmitter from 'eventemitter2'
 class Rule extends EventEmitter {
   /**
    * returns a new Rule instance
-   * @param {object,string} options, or json string that can be parsed into options
+   * @param {(object,string)=} options, or json string that can be parsed into options
    * @param {integer} options.priority (>1) - higher runs sooner.
    * @param {Object} options.event - event to fire when rule evaluates as successful
    * @param {string} options.event.type - name of event to emit
