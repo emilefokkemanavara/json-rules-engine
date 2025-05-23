@@ -161,7 +161,7 @@ class Engine extends EventEmitter {
    * Add a fact definition to the engine.  Facts are called by rules as they are evaluated.
    * @param {object|Fact} id - fact identifier or instance of Fact
    * @param {function} definitionFunc - function to be called when computing the fact value for a given rule
-   * @param {Object} options - options to initialize the fact with. used when "id" is not a Fact instance
+   * @param {Object=} options - options to initialize the fact with. used when "id" is not a Fact instance
    */
   addFact (id, valueOrMethod, options) {
     let factId = id

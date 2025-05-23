@@ -15,7 +15,7 @@ describe('Rule', () => {
     it('can be initialized with priority, conditions, event, and name', () => {
       const condition = {
         all: [Object.assign({}, conditionBase)]
-      }
+      } as any
       condition.operator = 'all'
       condition.priority = 25
       const opts = {
@@ -37,7 +37,7 @@ describe('Rule', () => {
     it('it can be initialized with a json string', () => {
       const condition = {
         all: [Object.assign({}, conditionBase)]
-      }
+      } as any
       condition.operator = 'all'
       condition.priority = 25
       const opts = {
@@ -206,7 +206,7 @@ describe('Rule', () => {
     }]
 
     it('orders based on priority', async () => {
-      const engine = new Engine()
+      const engine = Engine()
       engine.addFact('state', async () => {}, { priority: 500 })
       engine.addFact('segment', async () => {}, { priority: 50 })
       engine.addFact('accountType', async () => {}, { priority: 25 })
@@ -225,7 +225,7 @@ describe('Rule', () => {
 
   describe('evaluate()', () => {
     function setup () {
-      const engine = new Engine()
+      const engine = Engine()
       const rule = new Rule()
       rule.setConditions({
         all: []
@@ -251,7 +251,7 @@ describe('Rule', () => {
       const engineRunSpy = sinon.spy()
       const { engine, rule } = setup()
       rule.on('success', () => {
-        return new Promise(function (resolve) {
+        return new Promise<void>(function (resolve) {
           setTimeout(function () {
             ruleSuccessSpy()
             resolve()

@@ -74,7 +74,7 @@ describe('Engine: fact evaluation', () => {
     failureSpy = sandbox.spy()
   })
 
-  function setup (conditions = baseConditions(), engineOptions = {}) {
+  function setup (conditions: any = baseConditions(), engineOptions = {}) {
     engine = engineFactory([], engineOptions)
     const rule = factories.rule({ conditions, event })
     engine.addRule(rule)
@@ -92,7 +92,7 @@ describe('Engine: fact evaluation', () => {
           fact: 'undefined-fact',
           operator: 'equal',
           value: true
-        })
+        } as any)
         setup(conditions)
         return expect(engine.run()).to.be.rejectedWith(/Undefined fact: undefined-fact/)
       })
@@ -104,7 +104,7 @@ describe('Engine: fact evaluation', () => {
             fact: 'undefined-fact',
             operator: 'equal',
             value: true
-          })
+          } as any)
           setup(conditions, { allowUndefinedFacts: true })
           await engine.run()
           expect(successSpy).to.have.been.called()
@@ -117,7 +117,7 @@ describe('Engine: fact evaluation', () => {
             fact: 'undefined-fact',
             operator: 'equal',
             value: true
-          })
+          } as any)
           conditions.any[0].params.eligibilityId = 2
           setup(conditions, { allowUndefinedFacts: true })
           await engine.run()
@@ -206,7 +206,7 @@ describe('Engine: fact evaluation', () => {
       })
 
       it('correctly interprets "path" when target object properties have dots', async () => {
-        const complexCondition = conditions()
+        const complexCondition = conditions() as any
         complexCondition.any[0].path = '$.address.[\'dot.property\']'
         complexCondition.any[0].value = 'dot-property-value'
         complexCondition.any[0].operator = 'equal'

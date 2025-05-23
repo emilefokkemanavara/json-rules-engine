@@ -289,7 +289,7 @@ describe('Condition', () => {
   describe('boolean operators', () => {
     it('throws if not not an array', () => {
       const conditions = condition()
-      conditions.all = { foo: true }
+      conditions.all = { foo: true } as unknown as any
       expect(() => new Condition(conditions)).to.throw(/"all" must be an array/)
     })
 

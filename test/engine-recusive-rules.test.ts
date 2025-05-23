@@ -44,7 +44,7 @@ describe('Engine: recursive rules', () => {
   })
 
   let eventSpy
-  function setup (conditions = nestedAnyCondition) {
+  function setup (conditions: any = nestedAnyCondition) {
     eventSpy = sandbox.spy()
 
     engine = engineFactory()

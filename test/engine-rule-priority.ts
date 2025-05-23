@@ -68,7 +68,7 @@ describe('Engine: rule priorities', () => {
     const lowPrioritySpy = sandbox.spy()
 
     engine.on(highPriorityEvent.type, () => {
-      return new Promise(function (resolve) {
+      return new Promise<void>(function (resolve) {
         setTimeout(function () {
           highPrioritySpy()
           resolve()
@@ -76,7 +76,7 @@ describe('Engine: rule priorities', () => {
       })
     })
     engine.on(midPriorityEvent.type, () => {
-      return new Promise(function (resolve) {
+      return new Promise<void>(function (resolve) {
         setTimeout(function () {
           midPrioritySpy()
           resolve()
