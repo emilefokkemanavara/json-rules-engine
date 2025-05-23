@@ -8,7 +8,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "test": "mocha && npm run lint --silent && npm run test:types",
+    "test": "TS_NODE_PROJECT=test TS_NODE_FILES=true mocha && npm run lint --silent && npm run test:types",
     "test:types": "tsd",
     "lint": "standard --verbose --env mocha | snazzy || true",
     "lint:fix": "standard --fix --env mocha",
@@ -47,8 +47,13 @@
   },
   "mocha": {
     "require": [
-      "@babel/register"
+      "@babel/register",
+      "ts-node/register"
     ],
+    "extension": [
+      "ts"
+    ],
+    "exclude": ["**/*.d.ts"],
     "file": "./test/support/bootstrap.js",
     "checkLeaks": true,
     "recursive": true,
@@ -70,7 +75,14 @@
     "@babel/eslint-parser": "^7.27.1",
     "@babel/plugin-proposal-function-bind": "^7.27.1",
     "@babel/preset-env": "^7.27.2",
+    "@babel/preset-typescript": "^7.27.1",
     "@babel/register": "^7.27.1",
+    "@types/chai": "^4.3.4",
+    "@types/chai-as-promised": "^7.1.1",
+    "@types/dirty-chai": "^2.0.1",
+    "@types/mocha": "^10.0.10",
+    "@types/sinon": "^17.0.4",
+    "@types/sinon-chai": "^3.2.12",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "colors": "~1.4.0",
@@ -82,7 +94,9 @@
     "sinon-chai": "^3.7.0",
     "snazzy": "^9.0.0",
     "standard": "^17.1.2",
-    "tsd": "^0.17.0"
+    "ts-node": "^10.9.2",
+    "tsd": "^0.17.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "clone": "^2.1.2",

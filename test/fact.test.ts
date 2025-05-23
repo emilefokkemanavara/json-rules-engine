@@ -3,7 +3,7 @@
 import { Fact } from '../src/index'
 
 describe('Fact', () => {
-  function subject (id, definition, options) {
+  function subject (id, definition, options={}) {
     return new Fact(id, definition, options)
   }
   describe('Fact::constructor', () => {

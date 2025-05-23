@@ -116,7 +116,7 @@ describe('Almanac', () => {
     })
   })
 
-  describe('_getFact', _ => {
+  describe('_getFact', () => {
     it('retrieves the fact object', () => {
       const fact = new Fact('id', 1)
       almanac = new Almanac()

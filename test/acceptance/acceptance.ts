@@ -60,7 +60,7 @@ describe('Acceptance', () => {
     return new Promise(resolve => setTimeout(() => resolve(value), 5))
   }
 
-  function setup (options = {}) {
+  function setup (options: any = {}) {
     const engine = new Engine()
     highPrioritySpy = sandbox.spy()
     lowPrioritySpy = sandbox.spy()

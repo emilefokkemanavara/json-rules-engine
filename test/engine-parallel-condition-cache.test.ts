@@ -31,7 +31,7 @@ describe('Engine', () => {
 
   let eventSpy
   let factSpy
-  function setup (factOptions) {
+  function setup (factOptions={}) {
     factSpy = sandbox.spy()
     eventSpy = sandbox.spy()
 

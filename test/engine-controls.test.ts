@@ -29,7 +29,7 @@ describe('Engine: fact priority', () => {
         fact: 'age',
         operator: 'greaterThanInclusive',
         value: 18
-      }]
+      } as any]
     }
     let rule = factories.rule({ conditions, event, priority: 100 })
     engine.addRule(rule)
