@@ -15,11 +15,21 @@ export const RUNNING = 'RUNNING'
 export const FINISHED = 'FINISHED'
 
 class Engine extends EventEmitter {
+  rules
+  allowUndefinedFacts
+  allowUndefinedConditions
+  replaceFactsInEventParams
+  pathResolver
+  operators
+  facts
+  conditions
+  status
+  prioritizedRules
   /**
    * Returns a new Engine instance
    * @param  {Rule[]} rules - array of rules to initialize with
    */
-  constructor (rules = [], options = {}) {
+  constructor (rules = [], options: any = {}) {
     super()
     this.rules = []
     this.allowUndefinedFacts = options.allowUndefinedFacts || false
@@ -128,7 +138,7 @@ class Engine extends EventEmitter {
    * @param {string}   operatorOrName - operator identifier within the condition; i.e. instead of 'equals', 'greaterThan', etc
    * @param {function(factValue, jsonValue)} callback - the method to execute when the operator is encountered.
    */
-  addOperator (operatorOrName, cb) {
+  addOperator (operatorOrName, cb?: Function) {
     this.operators.addOperator(operatorOrName, cb)
   }
 
@@ -145,7 +155,7 @@ class Engine extends EventEmitter {
    * @param {string}   decoratorOrName - decorator identifier within the condition; i.e. instead of 'someFact', 'everyValue', etc
    * @param {function(factValue, jsonValue, next)} callback - the method to execute when the decorator is encountered.
    */
-  addOperatorDecorator (decoratorOrName, cb) {
+  addOperatorDecorator (decoratorOrName, cb?: Function) {
     this.operators.addOperatorDecorator(decoratorOrName, cb)
   }
 
@@ -163,7 +173,7 @@ class Engine extends EventEmitter {
    * @param {function} definitionFunc - function to be called when computing the fact value for a given rule
    * @param {Object=} options - options to initialize the fact with. used when "id" is not a Fact instance
    */
-  addFact (id, valueOrMethod, options) {
+  addFact (id, valueOrMethod, options: any = {}) {
     let factId = id
     let fact
     if (id instanceof Fact) {
@@ -265,7 +275,7 @@ class Engine extends EventEmitter {
    * @param  {Object} runOptions - run options
    * @return {Promise} resolves when the engine has completed running
    */
-  run (runtimeFacts = {}, runOptions = {}) {
+  run (runtimeFacts = {}, runOptions: any = {}) {
     debug('engine::run started')
     this.status = RUNNING
 
@@ -289,10 +299,10 @@ class Engine extends EventEmitter {
       debug('engine::run initialized runtime fact', { id: fact.id, value: fact.value, type: typeof fact.value })
     }
     const orderedSets = this.prioritizeRules()
-    let cursor = Promise.resolve()
+    let cursor = Promise.resolve<any>(undefined)
     // for each rule set, evaluate in parallel,
     // before proceeding to the next priority set.
-    return new Promise((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
       orderedSets.map((set) => {
         cursor = cursor.then(() => {
           return this.evaluateRules(set, almanac)
