@@ -6,7 +6,7 @@ class Fact {
   /**
    * Returns a new fact instance
    * @param  {string} id - fact unique identifer
-   * @param  {object} options
+   * @param  {object=} options
    * @param  {boolean} options.cache - whether to cache the fact's value for future rules
    * @param  {primitive|function} valueOrMethod - constant primitive, or method to call when computing the fact's value
    * @return {Fact}
