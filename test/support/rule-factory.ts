@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = (options) => {
+export default function(options?)  {
   options = options || {}
   return {
     name: options.name,
