@@ -12,9 +12,9 @@ export default class Condition {
       const subConditionsIsArray = Array.isArray(subConditions)
       if (booleanOperator !== 'not' && !subConditionsIsArray) { throw new Error(`"${booleanOperator}" must be an array`) }
       if (booleanOperator === 'not' && subConditionsIsArray) { throw new Error(`"${booleanOperator}" cannot be an array`) }
-      this.operator = booleanOperator
+      this['operator'] = booleanOperator
       // boolean conditions always have a priority; default 1
-      this.priority = parseInt(properties.priority, 10) || 1
+      this['priority'] = parseInt(properties.priority, 10) || 1
       if (subConditionsIsArray) {
         this[booleanOperator] = subConditions.map((c) => new Condition(c))
       } else {
@@ -39,12 +39,12 @@ export default class Condition {
    * @returns {string,object} json string or json-friendly object
    */
   toJSON (stringify = true) {
-    const props = {}
-    if (this.priority) {
-      props.priority = this.priority
+    const props: any = {}
+    if (this['priority']) {
+      props.priority = this['priority']
     }
-    if (this.name) {
-      props.name = this.name
+    if (this['name']) {
+      props.name = this['name']
     }
     const oper = Condition.booleanOperator(this)
     if (oper) {
@@ -54,25 +54,25 @@ export default class Condition {
         props[oper] = this[oper].toJSON(false)
       }
     } else if (this.isConditionReference()) {
-      props.condition = this.condition
+      props.condition = this['condition']
     } else {
-      props.operator = this.operator
-      props.value = this.value
-      props.fact = this.fact
-      if (this.factResult !== undefined) {
-        props.factResult = this.factResult
+      props.operator = this['operator']
+      props.value = this['value']
+      props.fact = this['fact']
+      if (this['factResult'] !== undefined) {
+        props.factResult = this['factResult']
       }
-      if (this.valueResult !== undefined) {
-        props.valueResult = this.valueResult
+      if (this['valueResult'] !== undefined) {
+        props.valueResult = this['valueResult']
       }
-      if (this.result !== undefined) {
-        props.result = this.result
+      if (this['result'] !== undefined) {
+        props.result = this['result']
       }
-      if (this.params) {
-        props.params = this.params
+      if (this['params']) {
+        props.params = this['params']
       }
-      if (this.path) {
-        props.path = this.path
+      if (this['path']) {
+        props.path = this['path']
       }
     }
     if (stringify) {
@@ -95,18 +95,18 @@ export default class Condition {
     if (!operatorMap) return Promise.reject(new Error('operatorMap required'))
     if (this.isBooleanOperator()) { return Promise.reject(new Error('Cannot evaluate() a boolean condition')) }
 
-    const op = operatorMap.get(this.operator)
-    if (!op) { return Promise.reject(new Error(`Unknown operator: ${this.operator}`)) }
+    const op = operatorMap.get(this['operator'])
+    if (!op) { return Promise.reject(new Error(`Unknown operator: ${this['operator']}`)) }
 
     return Promise.all([
-      almanac.getValue(this.value),
-      almanac.factValue(this.fact, this.params, this.path)
+      almanac.getValue(this['value']),
+      almanac.factValue(this['fact'], this['params'], this['path'])
     ]).then(([rightHandSideValue, leftHandSideValue]) => {
       const result = op.evaluate(leftHandSideValue, rightHandSideValue)
       debug(
         'condition::evaluate', {
           leftHandSideValue,
-          operator: this.operator,
+          operator: this['operator'],
           rightHandSideValue,
           result
         }
@@ -115,7 +115,7 @@ export default class Condition {
         result,
         leftHandSideValue,
         rightHandSideValue,
-        operator: this.operator
+        operator: this['operator']
       }
     })
   }

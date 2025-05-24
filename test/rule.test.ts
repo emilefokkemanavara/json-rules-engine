@@ -90,7 +90,7 @@ describe('Rule', () => {
 
   describe('setEvent()', () => {
     it('throws if no argument provided', () => {
-      expect(() => rule.setEvent()).to.throw(/Rule: setEvent\(\) requires event object/)
+      expect(() => (rule as any).setEvent()).to.throw(/Rule: setEvent\(\) requires event object/)
     })
 
     it('throws if argument is missing "type" property', () => {
@@ -100,7 +100,7 @@ describe('Rule', () => {
 
   describe('setEvent()', () => {
     it('throws if no argument provided', () => {
-      expect(() => rule.setEvent()).to.throw(/Rule: setEvent\(\) requires event object/)
+      expect(() => (rule as any).setEvent()).to.throw(/Rule: setEvent\(\) requires event object/)
     })
 
     it('throws if argument is missing "type" property', () => {

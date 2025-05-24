@@ -13,7 +13,7 @@
     "lint": "standard --verbose --env mocha | snazzy || true",
     "lint:fix": "standard --fix --env mocha",
     "prepublishOnly": "npm run build",
-    "build": "babel -d dist/ src/",
+    "build": "babel -d dist/ --extensions .ts,.js src/",
     "watch": "babel --watch --stage 1 -d dist/ src",
     "examples": "./test/support/example_runner.sh"
   },

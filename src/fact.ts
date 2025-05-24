@@ -3,6 +3,11 @@
 import hash from 'hash-it'
 
 class Fact {
+  id
+  type
+  priority
+  options
+  cacheKeyMethod
   /**
    * Returns a new fact instance
    * @param  {string} id - fact unique identifer
@@ -11,18 +16,18 @@ class Fact {
    * @param  {primitive|function} valueOrMethod - constant primitive, or method to call when computing the fact's value
    * @return {Fact}
    */
-  constructor (id, valueOrMethod, options) {
+  constructor (id, valueOrMethod, options?) {
     this.id = id
     const defaultOptions = { cache: true }
     if (typeof options === 'undefined') {
       options = defaultOptions
     }
     if (typeof valueOrMethod !== 'function') {
-      this.value = valueOrMethod
-      this.type = this.constructor.CONSTANT
+      (this as any).value = valueOrMethod
+      this.type = Fact.CONSTANT
     } else {
-      this.calculationMethod = valueOrMethod
-      this.type = this.constructor.DYNAMIC
+      (this as any).calculationMethod = valueOrMethod
+      this.type = Fact.DYNAMIC
     }
 
     if (!this.id) throw new Error('factId required')
@@ -34,11 +39,11 @@ class Fact {
   }
 
   isConstant () {
-    return this.type === this.constructor.CONSTANT
+    return this.type === Fact.CONSTANT
   }
 
   isDynamic () {
-    return this.type === this.constructor.DYNAMIC
+    return this.type === Fact.DYNAMIC
   }
 
   /**
@@ -47,12 +52,14 @@ class Fact {
    * @param  {Almanac} almanac
    * @return {any} calculation method results
    */
-  calculate (params, almanac) {
+  calculate()
+  calculate (params, almanac)
+  calculate (params?, almanac?) {
     // if constant fact w/set value, return immediately
     if (Object.prototype.hasOwnProperty.call(this, 'value')) {
-      return this.value
+      return (this as any).value
     }
-    return this.calculationMethod(params, almanac)
+    return (this as any).calculationMethod(params, almanac)
   }
 
   /**
@@ -89,9 +96,9 @@ class Fact {
       return hash
     }
   }
-}
 
-Fact.CONSTANT = 'CONSTANT'
-Fact.DYNAMIC = 'DYNAMIC'
+  static CONSTANT = 'CONSTANT'
+  static DYNAMIC = 'DYNAMIC'
+}
 
 export default Fact

@@ -3,6 +3,11 @@
 import deepClone from 'clone'
 
 export default class RuleResult {
+  conditions
+  event
+  priority
+  name
+  result
   constructor (conditions, event, priority, name) {
     this.conditions = deepClone(conditions)
     this.event = deepClone(event)

@@ -4,8 +4,8 @@ import { Operator } from '../src/index'
 
 describe('Operator', () => {
   describe('constructor()', () => {
-    function subject (...args) {
-      return new Operator(...args)
+    function subject (name, cb, factValueValidator?) {
+      return new Operator(name, cb, factValueValidator)
     }
 
     it('adds the operator', () => {
@@ -18,13 +18,13 @@ describe('Operator', () => {
 
     it('operator name', () => {
       expect(() => {
-        subject()
+        (subject as any)()
       }).to.throw(/Missing operator name/)
     })
 
     it('operator definition', () => {
       expect(() => {
-        subject('startsWithLetter')
+        (subject as any)('startsWithLetter')
       }).to.throw(/Missing operator callback/)
     })
   })

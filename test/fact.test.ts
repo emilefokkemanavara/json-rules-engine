@@ -10,7 +10,7 @@ describe('Fact', () => {
     it('works for constant facts', () => {
       const fact = subject('factId', 10)
       expect(fact.id).to.equal('factId')
-      expect(fact.value).to.equal(10)
+      expect((fact as any).value).to.equal(10)
     })
 
     it('works for dynamic facts', () => {
