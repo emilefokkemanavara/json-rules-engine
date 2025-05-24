@@ -10,10 +10,10 @@ describe('Engine: custom properties', () => {
     it('preserves custom properties set on fact', () => {
       engine = engineFactory()
       const fact = new Fact('age', 12)
-      fact.customId = 'uuid'
+      fact['customId'] = 'uuid'
       engine.addFact(fact)
       expect(engine.facts.get('age')).to.have.property('customId')
-      expect(engine.facts.get('age').customId).to.equal(fact.customId)
+      expect(engine.facts.get('age').customId).to.equal(fact['customId'])
     })
 
     describe('conditions', () => {
@@ -51,7 +51,7 @@ describe('Engine: custom properties', () => {
 
     it('preserves custom properties set on regular conditions', () => {
       engine = engineFactory()
-      const rule = new Rule()
+      const rule = new Rule() as any
       const ruleProperties = factories.rule()
       rule.setPriority(ruleProperties.priority)
         .setConditions(ruleProperties.conditions)

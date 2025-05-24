@@ -5,6 +5,8 @@ import OperatorDecorator from './operator-decorator'
 import debug from './debug'
 
 export default class OperatorMap {
+  operators
+  decorators
   constructor () {
     this.operators = new Map()
     this.decorators = new Map()
@@ -44,7 +46,7 @@ export default class OperatorMap {
     const suffix = ':' + operatorName
     const operatorNames = Array.from(this.operators.keys())
     for (let i = 0; i < operatorNames.length; i++) {
-      if (operatorNames[i].endsWith(suffix)) {
+      if ((operatorNames[i] as string).endsWith(suffix)) {
         this.operators.delete(operatorNames[i])
       }
     }
@@ -85,7 +87,7 @@ export default class OperatorMap {
     const prefix = decoratorName + ':'
     const operatorNames = Array.from(this.operators.keys())
     for (let i = 0; i < operatorNames.length; i++) {
-      if (operatorNames[i].includes(prefix)) {
+      if ((operatorNames[i] as string).includes(prefix)) {
         this.operators.delete(operatorNames[i])
       }
     }

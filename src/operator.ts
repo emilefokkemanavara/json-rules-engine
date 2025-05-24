@@ -1,6 +1,9 @@
 'use strict'
 
 export default class Operator {
+  name
+  cb
+  factValueValidator
   /**
    * Constructor
    * @param {string}   name - operator identifier
@@ -8,7 +11,7 @@ export default class Operator {
    * @param {function}  [factValueValidator] - optional validator for asserting the data type of the fact
    * @returns {Operator} - instance
    */
-  constructor (name, cb, factValueValidator) {
+  constructor (name, cb, factValueValidator?) {
     this.name = String(name)
     if (!name) throw new Error('Missing operator name')
     if (typeof cb !== 'function') throw new Error('Missing operator callback')

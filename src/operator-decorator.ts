@@ -3,6 +3,9 @@
 import Operator from './operator'
 
 export default class OperatorDecorator {
+  name
+  cb
+  factValueValidator
   /**
    * Constructor
    * @param {string}   name - decorator identifier
@@ -10,7 +13,7 @@ export default class OperatorDecorator {
    * @param {function}  [factValueValidator] - optional validator for asserting the data type of the fact
    * @returns {OperatorDecorator} - instance
    */
-  constructor (name, cb, factValueValidator) {
+  constructor (name, cb, factValueValidator?) {
     this.name = String(name)
     if (!name) throw new Error('Missing decorator name')
     if (typeof cb !== 'function') throw new Error('Missing decorator callback')

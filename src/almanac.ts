@@ -16,7 +16,13 @@ function defaultPathResolver (value, path) {
  * A new almanac is used for every engine run()
  */
 export default class Almanac {
-  constructor (options = {}) {
+  factMap
+  factResultsCache
+  allowUndefinedFacts
+  pathResolver
+  events
+  ruleResults
+  constructor (options: any = {}) {
     this.factMap = new Map()
     this.factResultsCache = new Map() // { cacheKey:  Promise<factValu> }
     this.allowUndefinedFacts = Boolean(options.allowUndefinedFacts)
@@ -96,7 +102,9 @@ export default class Almanac {
    * @param {function} definitionFunc - function to be called when computing the fact value for a given rule
    * @param {Object} options - options to initialize the fact with. used when "id" is not a Fact instance
    */
-  addFact (id, valueOrMethod, options) {
+  addFact(id)
+  addFact (id, valueOrMethod, options?)
+  addFact (id, valueOrMethod?, options?) {
     let factId = id
     let fact
     if (id instanceof Fact) {

@@ -8,8 +8,8 @@ const startsWithLetter = new Operator('startsWithLetter', (factValue, jsonValue)
 
 describe('OperatorDecorator', () => {
   describe('constructor()', () => {
-    function subject (...args) {
-      return new OperatorDecorator(...args)
+    function subject (name, cb, factValueValidator?) {
+      return new OperatorDecorator(name, cb, factValueValidator)
     }
 
     it('adds the decorator', () => {
@@ -20,13 +20,13 @@ describe('OperatorDecorator', () => {
 
     it('decorator name', () => {
       expect(() => {
-        subject()
+        (subject as any)()
       }).to.throw(/Missing decorator name/)
     })
 
     it('decorator definition', () => {
       expect(() => {
-        subject('test')
+        (subject as any)('test')
       }).to.throw(/Missing decorator callback/)
     })
   })

@@ -38,7 +38,7 @@ describe('Condition', () => {
       const subject = new Condition(properties)
       expect(subject).to.have.property('operator')
       expect(subject).to.have.property('priority')
-      expect(subject.priority).to.equal(1)
+      expect((subject as any).priority).to.equal(1)
     })
   })
 
@@ -240,10 +240,10 @@ describe('Condition', () => {
         const ageFact = new Fact('age', [{ id: 50 }, { id: 60 }])
         const almanac = new Almanac()
         almanac.addFact(ageFact)
-        expect((await condition.evaluate(almanac, operators)).result).to.equal(true)
+        expect((await (condition as any).evaluate(almanac, operators)).result).to.equal(true);
 
-        condition.value = 100 // negative case
-        expect((await condition.evaluate(almanac, operators)).result).to.equal(false)
+        (condition as any).value = 100 // negative case
+        expect((await (condition as any).evaluate(almanac, operators)).result).to.equal(false)
       })
 
       it('ignores "path" when non-objects are returned by the fact', async () => {
@@ -252,10 +252,10 @@ describe('Condition', () => {
         almanac.addFact(ageFact)
 
         const condition = new Condition({ operator: 'equal', path: '$.[0].id', fact: 'age', value: 50 })
-        expect((await condition.evaluate(almanac, operators, 50)).result).to.equal(true)
+        expect((await (condition as any).evaluate(almanac, operators, 50)).result).to.equal(true);
 
-        condition.value = 100 // negative case
-        expect((await condition.evaluate(almanac, operators, 50)).result).to.equal(false)
+        (condition as any).value = 100 // negative case
+        expect((await (condition as any).evaluate(almanac, operators, 50)).result).to.equal(false)
       })
     })
 
@@ -278,10 +278,10 @@ describe('Condition', () => {
         const usersFact = new Fact('users', userData)
         const almanac = new Almanac()
         almanac.addFact(usersFact)
-        expect((await condition.evaluate(almanac, operators)).result).to.equal(true)
+        expect((await (condition as any).evaluate(almanac, operators)).result).to.equal(true);
 
-        condition.value = 'work' // negative case
-        expect((await condition.evaluate(almanac, operators)).result).to.equal(false)
+        (condition as any).value = 'work' // negative case
+        expect((await (condition as any).evaluate(almanac, operators)).result).to.equal(false)
       })
     })
   })
@@ -314,7 +314,7 @@ describe('Condition', () => {
 
   describe('atomic facts', () => {
     it('throws if no options are provided', () => {
-      expect(() => new Condition()).to.throw(/Condition: constructor options required/)
+      expect(() => new (Condition as any)()).to.throw(/Condition: constructor options required/)
     })
 
     it('throws for a missing "operator"', () => {

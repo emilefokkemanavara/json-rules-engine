@@ -50,7 +50,7 @@ describe('Almanac', () => {
       const fact = new Fact('fact1', 3)
       almanac = new Almanac()
       almanac.addFact(fact)
-      return expect(almanac.factValue('fact1')).to.eventually.equal(fact.value)
+      return expect(almanac.factValue('fact1')).to.eventually.equal((fact as any).value)
     })
   })
 
@@ -112,7 +112,7 @@ describe('Almanac', () => {
       const fact = new Fact('factId', 'factValue')
       almanac = new Almanac()
       almanac._addConstantFact(fact)
-      expect(almanac.factMap.get(fact.id).value).to.equal(fact.value)
+      expect(almanac.factMap.get(fact.id).value).to.equal((fact as any).value)
     })
   })
 
