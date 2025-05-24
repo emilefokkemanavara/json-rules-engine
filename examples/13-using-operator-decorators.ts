@@ -11,8 +11,8 @@
  *   DEBUG=json-rules-engine node ./examples/12-using-operator-decorators.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
+import 'colors'
+import { Engine } from 'json-rules-engine'
 
 async function start () {
   /**
@@ -60,7 +60,7 @@ async function start () {
   await engine.run(facts)
 
   // add a new decorator to allow for a case-insensitive match
-  engine.addOperatorDecorator('caseInsensitive', (factValue, jsonValue, next) => {
+  engine.addOperatorDecorator<string, string, string, string>('caseInsensitive', (factValue, jsonValue, next) => {
     return next(factValue.toLowerCase(), jsonValue.toLowerCase())
   })
 

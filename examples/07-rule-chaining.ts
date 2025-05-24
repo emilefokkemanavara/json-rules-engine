@@ -11,9 +11,9 @@
  *   DEBUG=json-rules-engine node ./examples/07-rule-chaining.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
-const { getAccountInformation } = require('./support/account-api-client')
+import 'colors'
+import { Engine } from 'json-rules-engine'
+import client from './support/account-api-client'
 
 async function start () {
   /**
@@ -44,7 +44,7 @@ async function start () {
       // asychronous operations can be performed within callbacks
       // engine execution will not proceed until the returned promises is resolved
       const accountId = await almanac.factValue('accountId')
-      const accountInfo = await getAccountInformation(accountId)
+      const accountInfo = await client.getAccountInformation(accountId)
       almanac.addFact('accountInfo', accountInfo)
     },
     onFailure: function (event, almanac) {
@@ -85,7 +85,7 @@ async function start () {
    */
   engine
     .on('success', async (event, almanac) => {
-      const accountInfo = await almanac.factValue('accountInfo')
+      const accountInfo: any = await almanac.factValue('accountInfo')
       const accountId = await almanac.factValue('accountId')
       console.log(`${accountId}(${accountInfo.company}) ` + 'DID'.green + ` meet conditions for the ${event.type.underline} rule.`)
     })
@@ -101,7 +101,7 @@ async function start () {
   let results = await engine.run(facts)
 
   // isScrewdriverAficionado was a fact set by engine.run()
-  let isScrewdriverAficionado = results.almanac.factValue('screwdriverAficionado')
+  let isScrewdriverAficionado = await results.almanac.factValue('screwdriverAficionado')
   console.log(`${facts.accountId} ${isScrewdriverAficionado ? 'IS'.green : 'IS NOT'.red} a screwdriver aficionado`)
 
   facts = { accountId: 'jefferson', drinksOrangeJuice: true, enjoysVodka: false, isSociable: true, accountInfo: {} }

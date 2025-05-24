@@ -8,8 +8,8 @@
  * For detailed output:
  *   DEBUG=json-rules-engine node ./examples/09-rule-results.js
  */
-require('colors')
-const { Engine } = require('json-rules-engine')
+import 'colors'
+import { Engine } from 'json-rules-engine'
 
 async function start () {
   /**
@@ -64,7 +64,7 @@ async function start () {
    */
   engine.on('success', (event, almanac, ruleResult) => {
     almanac.factValue('username').then(username => {
-      render(`${username.bold} succeeded ${ruleResult.name}! ${event.params.message}`, ruleResult)
+      render(`${(username as string).bold} succeeded ${ruleResult.name}! ${event.params.message}`, ruleResult)
     })
   })
 
@@ -73,7 +73,7 @@ async function start () {
    */
   engine.on('failure', (event, almanac, ruleResult) => {
     almanac.factValue('username').then(username => {
-      render(`${username.bold} failed ${ruleResult.name} - `, ruleResult)
+      render(`${(username as string).bold} failed ${ruleResult.name} - `, ruleResult)
     })
   })
 

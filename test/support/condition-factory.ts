@@ -1,6 +1,6 @@
 'use strict'
 
-module.exports = function (options) {
+export default function (options) {
   return {
     fact: options.fact || null,
     value: options.value || null,

@@ -9,8 +9,8 @@
  *   DEBUG=json-rules-engine node ./examples/01-hello-world.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
+import 'colors'
+import { Engine } from 'json-rules-engine'
 
 async function start () {
   /**

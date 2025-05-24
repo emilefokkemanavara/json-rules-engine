@@ -10,8 +10,8 @@
  *   DEBUG=json-rules-engine node ./examples/10-condition-sharing.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
+import 'colors'
+import { Engine } from 'json-rules-engine'
 
 async function start () {
   /**
@@ -105,7 +105,7 @@ async function start () {
     })
 
   // define fact(s) known at runtime
-  let facts = {
+  let facts: any = {
     accountId: 'washington',
     drinksOrangeJuice: true,
     enjoysVodka: true,

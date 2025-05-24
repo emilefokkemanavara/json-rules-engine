@@ -9,8 +9,8 @@
  *   DEBUG=json-rules-engine node ./examples/08-fact-comparison.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
+import 'colors'
+import { Engine } from 'json-rules-engine'
 
 async function start () {
   /**
@@ -55,7 +55,7 @@ async function start () {
     return almanac.factValue('accounts')
       .then(accounts => {
         // use "params" to filter down to the type specified, in this case the "customer" account
-        const customerAccount = accounts.filter(account => account.type === params.accountType)
+        const customerAccount = (accounts as any).filter(account => account.type === params.accountType)
         // return the customerAccount object, which "path" will use to pull the "balance" property
         return customerAccount[0]
       })
@@ -66,7 +66,7 @@ async function start () {
     return almanac.factValue('products')
       .then(products => {
         // use "params" to filter down to the product specified, in this case the "giftCard" product
-        const product = products.filter(product => product.productId === params.productId)
+        const product = (products as any).filter(product => product.productId === params.productId)
         // return the product object, which "path" will use to pull the "price" property
         return product[0]
       })
