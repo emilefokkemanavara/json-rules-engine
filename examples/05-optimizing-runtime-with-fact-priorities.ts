@@ -9,9 +9,9 @@
  *   DEBUG=json-rules-engine node ./examples/05-optimizing-runtime-with-fact-priorities.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
-const accountClient = require('./support/account-api-client')
+import 'colors'
+import { Engine } from 'json-rules-engine'
+import accountClient from './support/account-api-client'
 
 async function start () {
   /**

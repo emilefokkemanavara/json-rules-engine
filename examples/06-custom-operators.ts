@@ -15,8 +15,8 @@
  *   DEBUG=json-rules-engine node ./examples/06-custom-operators.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
+import 'colors'
+import { Engine } from 'json-rules-engine'
 
 async function start () {
   /**
@@ -27,7 +27,7 @@ async function start () {
   /**
    * Define a 'startsWith' custom operator, for use in later rules
    */
-  engine.addOperator('startsWith', (factValue, jsonValue) => {
+  engine.addOperator<string, string>('startsWith', (factValue, jsonValue) => {
     if (!factValue.length) return false
     return factValue[0].toLowerCase() === jsonValue.toLowerCase()
   })

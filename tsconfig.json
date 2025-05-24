@@ -1,7 +1,16 @@
 {
+    "compilerOptions": {
+        "allowJs": true,
+        "module": "CommonJS",
+        "target": "ESNext",
+        "composite": true,
+        "emitDeclarationOnly": true,
+        "esModuleInterop": true
+    },
     "include": [],
     "references": [
         {"path": "./src"},
-        {"path": "./test"}
+        {"path": "./test"},
+        {"path": "./tsconfig.types.json"}
     ]
 }

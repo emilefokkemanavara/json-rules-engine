@@ -1,8 +1,7 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
-        "outDir": "../dist-types/test",
+        "outDir": "../dist-types/examples",
     },
-    "references": [{"path": "../src"}],
     "include": ["**/*"]
 }

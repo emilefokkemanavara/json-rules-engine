@@ -11,9 +11,9 @@
  *   DEBUG=json-rules-engine node ./examples/04-fact-dependency.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
-const accountClient = require('./support/account-api-client')
+import 'colors'
+import { Engine } from 'json-rules-engine'
+import accountClient from './support/account-api-client'
 
 async function start () {
   /**
@@ -94,7 +94,7 @@ async function start () {
   engine.addFact('employee-tenure', (params, almanac) => {
     return almanac.factValue('account-information')
       .then(accountInformation => {
-        const created = new Date(accountInformation.createdAt)
+        const created = new Date((accountInformation as any).createdAt)
         const now = new Date()
         switch (params.unit) {
           case 'years':

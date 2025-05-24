@@ -1,6 +1,6 @@
 'use strict'
 
-require('colors')
+import 'colors'
 
 const accountData = {
   washington: {
@@ -26,7 +26,7 @@ const accountData = {
 /**
  * mock api client for retrieving account information
  */
-module.exports = {
+const client = {
   getAccountInformation: (accountId) => {
     const message = 'loading account information for "' + accountId + '"'
     console.log(message.dim)
@@ -37,3 +37,5 @@ module.exports = {
     })
   }
 }
+
+export default client;

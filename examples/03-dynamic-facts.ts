@@ -10,11 +10,11 @@
  *   DEBUG=json-rules-engine node ./examples/03-dynamic-facts.js
  */
 
-require('colors')
-const { Engine } = require('json-rules-engine')
+import 'colors'
+import { Engine } from 'json-rules-engine'
 
 // example client for making asynchronous requests to an api, database, etc
-const apiClient = require('./support/account-api-client')
+import apiClient from './support/account-api-client'
 
 async function start () {
   /**

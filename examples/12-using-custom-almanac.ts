@@ -1,13 +1,14 @@
 'use strict'
 
-require('colors')
-const { Almanac, Engine } = require('json-rules-engine')
+import 'colors'
+import { Almanac, Engine } from 'json-rules-engine'
 
 /**
  * Almanac that support piping values through named functions
  */
 class PipedAlmanac extends Almanac {
-  constructor (options) {
+  pipes
+  constructor (options?) {
     super(options)
     this.pipes = new Map()
   }

@@ -10,8 +10,8 @@
  *   DEBUG=json-rules-engine node ./examples/11-using-facts-in-events.js
  */
 
-require('colors')
-const { Engine, Fact } = require('json-rules-engine')
+import 'colors'
+import { Engine, Fact } from 'json-rules-engine'
 
 async function start () {
   /**
