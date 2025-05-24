@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "TS_NODE_PROJECT=test TS_NODE_FILES=true mocha && npm run lint --silent && npm run test:types",
-    "test:types": "tsd",
+    "test:types": "tsd && tsc --build",
     "lint": "standard --verbose --env mocha | snazzy || true",
     "lint:fix": "standard --fix --env mocha",
     "prepublishOnly": "npm run build",

@@ -146,7 +146,9 @@ const topLevelNotConditionsResult = topLevelConditionResult.then(r => (r as NotC
 expectType<Promise<boolean | undefined>>(topLevelNotConditionsResult)
 
 // Alamanac tests
-const almanac: Almanac = (await engine.run()).almanac;
+async function run(){
+  const almanac: Almanac = (await engine.run()).almanac;
 
-expectType<Promise<string>>(almanac.factValue<string>("test-fact"));
-expectType<void>(almanac.addRuntimeFact("test-fact", "some-value"));
+  expectType<Promise<string>>(almanac.factValue<string>("test-fact"));
+  expectType<void>(almanac.addRuntimeFact("test-fact", "some-value"));
+}
