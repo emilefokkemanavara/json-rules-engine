@@ -13,7 +13,7 @@
     "lint": "standard --verbose --env mocha | snazzy || true",
     "lint:fix": "standard --fix --env mocha",
     "prepublishOnly": "npm run build",
-    "build": "babel -d dist/ --extensions .ts,.js src/",
+    "build": "babel -d dist/ --extensions .ts --ignore \"**/*.d.ts\" src/",
     "watch": "babel --watch --stage 1 -d dist/ src",
     "examples": "./test/support/example_runner.sh"
   },
@@ -53,7 +53,9 @@
     "extension": [
       "ts"
     ],
-    "exclude": ["**/*.d.ts"],
+    "exclude": [
+      "**/*.d.ts"
+    ],
     "file": "./test/support/bootstrap.js",
     "checkLeaks": true,
     "recursive": true,
@@ -81,6 +83,7 @@
     "@types/chai-as-promised": "^7.1.1",
     "@types/dirty-chai": "^2.0.1",
     "@types/mocha": "^10.0.10",
+    "@types/node": "^22.15.21",
     "@types/sinon": "^17.0.4",
     "@types/sinon-chai": "^3.2.12",
     "chai": "^4.3.4",
@@ -96,7 +99,7 @@
     "standard": "^17.1.2",
     "ts-node": "^10.9.2",
     "tsd": "^0.17.0",
-    "typescript": "^5.8.3"
+    "typescript": "5.1"
   },
   "dependencies": {
     "clone": "^2.1.2",
