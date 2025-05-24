@@ -7,9 +7,15 @@ import deepClone from 'clone'
 import EventEmitter from 'eventemitter2'
 
 class Rule extends EventEmitter {
+  priority
+  name
+  conditions
+  ruleEvent
+  event
+  engine
   /**
    * returns a new Rule instance
-   * @param {object,string} options, or json string that can be parsed into options
+   * @param {(object,string)=} options, or json string that can be parsed into options
    * @param {integer} options.priority (>1) - higher runs sooner.
    * @param {Object} options.event - event to fire when rule evaluates as successful
    * @param {string} options.event.type - name of event to emit
@@ -18,7 +24,7 @@ class Rule extends EventEmitter {
    * @param {any} options.name - identifier for a particular rule, particularly valuable in RuleResult output
    * @return {Rule} instance
    */
-  constructor (options) {
+  constructor (options?) {
     super()
     if (typeof options === 'string') {
       options = JSON.parse(options)
@@ -349,7 +355,7 @@ class Rule extends EventEmitter {
      */
     const processResult = (result) => {
       ruleResult.setResult(result)
-      let processEvent = Promise.resolve()
+      let processEvent = Promise.resolve<any>(undefined)
       if (this.engine.replaceFactsInEventParams) {
         processEvent = ruleResult.resolveEventParams(almanac)
       }
