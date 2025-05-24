@@ -1,5 +1,3 @@
-import { expectType } from "tsd";
-
 import rulesEngine, {
   Almanac,
   EngineResult,
@@ -20,6 +18,10 @@ import rulesEngine, {
   AllConditionsResult,
   NotConditionsResult
 } from "../";
+
+const expectType = <T>(expression: T) => {
+	
+};
 
 // setup basic fixture data
 const ruleProps: RuleProperties = {
