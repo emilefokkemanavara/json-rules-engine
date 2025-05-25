@@ -1,0 +1,12 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../dist-types/examples",
+        "paths": {
+            "json-rules-engine": ["../types/index.d.ts"]
+        },
+        "types": ["node"]
+    },
+    "references": [{"path": "../tsconfig.types.json"}],
+    "include": ["**/*"]
+}

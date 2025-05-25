@@ -4,5 +4,6 @@ npm-debug.log
 .idea
 .DS_Store
 dist
+dist-types
 *.tgz
 package-lock.json
