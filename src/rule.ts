@@ -5,13 +5,14 @@ import RuleResult from './rule-result'
 import debug from './debug'
 import deepClone from 'clone'
 import EventEmitter from 'eventemitter2'
+import { Event, RuleProperties, TopLevelCondition, Rule as RuleClass, RuleSerializable } from '../types'
 
-class Rule extends EventEmitter {
-  priority
-  name
+class Rule extends EventEmitter implements RuleClass {
+  public priority: number
+  public name: string
   conditions
-  ruleEvent
-  event
+  public ruleEvent: Event
+  public event: Event
   engine
   /**
    * returns a new Rule instance
@@ -24,10 +25,13 @@ class Rule extends EventEmitter {
    * @param {any} options.name - identifier for a particular rule, particularly valuable in RuleResult output
    * @return {Rule} instance
    */
-  constructor (options?) {
+  constructor (optionsOrString?: RuleProperties | string) {
     super()
-    if (typeof options === 'string') {
-      options = JSON.parse(options)
+    let options: RuleProperties | undefined;
+    if (typeof optionsOrString === 'string') {
+      options = JSON.parse(optionsOrString)
+    }else{
+      options = optionsOrString;
     }
     if (options && options.conditions) {
       this.setConditions(options.conditions)
@@ -38,7 +42,7 @@ class Rule extends EventEmitter {
     if (options && options.onFailure) {
       this.on('failure', options.onFailure)
     }
-    if (options && (options.name || options.name === 0)) {
+    if (options && (options.name || (options.name as unknown as number) === 0)) {
       this.setName(options.name)
     }
 
@@ -53,8 +57,8 @@ class Rule extends EventEmitter {
    * Sets the priority of the rule
    * @param {integer} priority (>=1) - increasing the priority causes the rule to be run prior to other rules
    */
-  setPriority (priority) {
-    priority = parseInt(priority, 10)
+  public setPriority (priorityProbablyNumber: number): this {
+    const priority = typeof priorityProbablyNumber === 'string' ? parseInt(priorityProbablyNumber, 10) : priorityProbablyNumber;
     if (priority <= 0) throw new Error('Priority must be greater than zero')
     this.priority = priority
     return this
@@ -64,11 +68,11 @@ class Rule extends EventEmitter {
    * Sets the name of the rule
    * @param {any} name - any truthy input and zero is allowed
    */
-  setName (name) {
+  setName (name: unknown) {
     if (!name && name !== 0) {
       throw new Error('Rule "name" must be defined')
     }
-    this.name = name
+    this.name = name as string
     return this
   }
 
@@ -76,7 +80,7 @@ class Rule extends EventEmitter {
    * Sets the conditions to run when evaluating the rule.
    * @param {object} conditions - conditions, root element must be a boolean operator
    */
-  setConditions (conditions) {
+  public setConditions (conditions: TopLevelCondition) {
     if (
       !Object.prototype.hasOwnProperty.call(conditions, 'all') &&
       !Object.prototype.hasOwnProperty.call(conditions, 'any') &&
@@ -97,7 +101,7 @@ class Rule extends EventEmitter {
    * @param {string} event.type - event name to emit on
    * @param {string} event.params - parameters to emit as the argument of the event emission
    */
-  setEvent (event) {
+  public setEvent (event: Event) {
     if (!event) throw new Error('Rule: setEvent() requires event object')
     if (!Object.prototype.hasOwnProperty.call(event, 'type')) {
       throw new Error(
@@ -154,8 +158,12 @@ class Rule extends EventEmitter {
     return this
   }
 
+  toJSON(): string;
+  toJSON<T extends boolean>(
+    stringify: T
+  ): T extends true ? string : RuleSerializable
   toJSON (stringify = true) {
-    const props = {
+    const props: RuleSerializable = {
       conditions: this.conditions.toJSON(false),
       priority: this.priority,
       event: this.ruleEvent,

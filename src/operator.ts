@@ -1,9 +1,11 @@
 'use strict'
 
-export default class Operator {
-  name
-  cb
-  factValueValidator
+import { OperatorEvaluator, Operator as OperatorClass } from "../types"
+
+export default class Operator<TFactValue = unknown, TJsonValue = unknown> implements OperatorClass<TFactValue, TJsonValue> {
+  public name: string
+  cb: OperatorEvaluator<TFactValue, TJsonValue>
+  factValueValidator: (factValue: TFactValue) => boolean
   /**
    * Constructor
    * @param {string}   name - operator identifier
@@ -11,7 +13,7 @@ export default class Operator {
    * @param {function}  [factValueValidator] - optional validator for asserting the data type of the fact
    * @returns {Operator} - instance
    */
-  constructor (name, cb, factValueValidator?) {
+  constructor (name: string, cb: OperatorEvaluator<TFactValue, TJsonValue>, factValueValidator?: (factValue: TFactValue) => boolean) {
     this.name = String(name)
     if (!name) throw new Error('Missing operator name')
     if (typeof cb !== 'function') throw new Error('Missing operator callback')
@@ -26,7 +28,7 @@ export default class Operator {
    * @param   {mixed} jsonValue - "value" property of the condition
    * @returns {Boolean} - whether the values pass the operator test
    */
-  evaluate (factValue, jsonValue) {
+  evaluate (factValue: TFactValue, jsonValue: TJsonValue) {
     return this.factValueValidator(factValue) && this.cb(factValue, jsonValue)
   }
 }

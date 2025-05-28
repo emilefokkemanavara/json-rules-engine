@@ -1,12 +1,13 @@
 'use strict'
 
 import deepClone from 'clone'
+import { RuleResultSerializable, RuleResult as RuleResultClass, Event } from '../types'
 
-export default class RuleResult {
+export default class RuleResult implements RuleResultClass {
   conditions
-  event
-  priority
-  name
+  event?: Event
+  priority: number
+  name: string
   result
   constructor (conditions, event, priority, name) {
     this.conditions = deepClone(conditions)
@@ -37,6 +38,10 @@ export default class RuleResult {
     return Promise.resolve()
   }
 
+  toJSON(): string;
+  toJSON<T extends boolean>(
+    stringify: T
+  ): T extends true ? string : RuleResultSerializable;
   toJSON (stringify = true) {
     const props = {
       conditions: this.conditions.toJSON(false),

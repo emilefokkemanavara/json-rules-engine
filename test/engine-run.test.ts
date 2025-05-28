@@ -116,13 +116,13 @@ describe('Engine: run', () => {
 
   describe('custom alamanc', () => {
     class CapitalAlmanac extends Almanac {
-      factValue (factId, params, path) {
-        return super.factValue(factId, params, path).then(value => {
+      factValue<T>(factId, params, path): Promise<T> {
+        return super.factValue<T | string>(factId, params, path).then(value => {
           if (typeof value === 'string') {
             return value.toUpperCase()
           }
           return value
-        })
+        }) as Promise<T>
       }
     }
 

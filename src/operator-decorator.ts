@@ -1,11 +1,12 @@
 'use strict'
 
+import { OperatorDecoratorEvaluator, OperatorEvaluator, OperatorDecorator as OperatorDecoratorClass } from '../types'
 import Operator from './operator'
 
-export default class OperatorDecorator {
-  name
-  cb
-  factValueValidator
+export default class OperatorDecorator<A = unknown, B = unknown, NextA = unknown, NextB = unknown> implements OperatorDecoratorClass<A, B, NextA, NextB> {
+  name: string
+  cb: OperatorDecoratorEvaluator<A, B, NextA, NextB>
+  factValueValidator?: (factValue: A) => boolean
   /**
    * Constructor
    * @param {string}   name - decorator identifier
@@ -13,7 +14,7 @@ export default class OperatorDecorator {
    * @param {function}  [factValueValidator] - optional validator for asserting the data type of the fact
    * @returns {OperatorDecorator} - instance
    */
-  constructor (name, cb, factValueValidator?) {
+  constructor (name: string, cb: OperatorDecoratorEvaluator<A, B, NextA, NextB>, factValueValidator?: (factValue: A) => boolean) {
     this.name = String(name)
     if (!name) throw new Error('Missing decorator name')
     if (typeof cb !== 'function') throw new Error('Missing decorator callback')
@@ -27,9 +28,9 @@ export default class OperatorDecorator {
    * @param   {Operator} operator - fact result
    * @returns {Operator} - whether the values pass the operator test
    */
-  decorate (operator) {
-    const next = operator.evaluate.bind(operator)
-    return new Operator(
+  decorate (operator: Operator<NextA, NextB>): Operator<A, B> {
+    const next: OperatorEvaluator<NextA, NextB> = operator.evaluate.bind(operator)
+    return new Operator<A, B>(
         `${this.name}:${operator.name}`,
         (factValue, jsonValue) => {
           return this.cb(factValue, jsonValue, next)

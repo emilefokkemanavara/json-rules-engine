@@ -294,7 +294,7 @@ describe('Condition', () => {
     })
 
     it('throws if is an array and condition is "not"', () => {
-      const conditions = {
+      const conditions: any = {
         not: [{ foo: true }]
       }
       expect(() => new Condition(conditions)).to.throw(/"not" cannot be an array/)

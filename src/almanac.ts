@@ -5,6 +5,8 @@ import { UndefinedFactError } from './errors'
 import debug from './debug'
 
 import { JSONPath } from 'jsonpath-plus'
+import { AlmanacOptions } from '../types'
+import { Fact as FactClass, DynamicFactCallback, FactOptions, Almanac as AlmanacClass } from '../types'
 
 function defaultPathResolver (value, path) {
   return JSONPath({ path, json: value, wrap: false })
@@ -15,14 +17,14 @@ function defaultPathResolver (value, path) {
  * Triggers fact computations and saves the results
  * A new almanac is used for every engine run()
  */
-export default class Almanac {
+export default class Almanac implements AlmanacClass {
   factMap
   factResultsCache
   allowUndefinedFacts
   pathResolver
   events
   ruleResults
-  constructor (options: any = {}) {
+  constructor (options: AlmanacOptions = {}) {
     this.factMap = new Map()
     this.factResultsCache = new Map() // { cacheKey:  Promise<factValu> }
     this.allowUndefinedFacts = Boolean(options.allowUndefinedFacts)
@@ -102,21 +104,22 @@ export default class Almanac {
    * @param {function} definitionFunc - function to be called when computing the fact value for a given rule
    * @param {Object} options - options to initialize the fact with. used when "id" is not a Fact instance
    */
-  addFact(id)
-  addFact (id, valueOrMethod, options?)
-  addFact (id, valueOrMethod?, options?) {
-    let factId = id
-    let fact
-    if (id instanceof Fact) {
-      factId = id.id
-      fact = id
-    } else {
-      fact = new Fact(id, valueOrMethod, options)
+  addFact<T>(fact: FactClass<T>): this
+  addFact<T>(id: string, valueCallback: DynamicFactCallback<T> | T, options?: FactOptions)
+  addFact<T>(factOrId: FactClass<T> | string, valueCallback?: DynamicFactCallback<T> | T, options?: FactOptions) {
+    let factId: string
+    let fact: Fact
+    if (factOrId instanceof Fact) {
+      factId = factOrId.id
+      fact = factOrId
+    } else if(typeof factOrId === 'string'){
+      fact = new Fact(factOrId, valueCallback, options)
+      factId = factOrId as string;
     }
     debug('almanac::addFact', { id: factId })
     this.factMap.set(factId, fact)
     if (fact.isConstant()) {
-      this._setFactValue(fact, {}, fact.value)
+      this._setFactValue(fact, {}, (fact as any).value)
     }
     return this
   }
@@ -127,7 +130,7 @@ export default class Almanac {
    * @param {String} fact - fact identifier
    * @param {Mixed} value - constant value of the fact
    */
-  addRuntimeFact (factId, value) {
+  addRuntimeFact (factId: string, value: any): void {
     debug('almanac::addRuntimeFact', { id: factId })
     const fact = new Fact(factId, value)
     return this._addConstantFact(fact)
@@ -141,7 +144,7 @@ export default class Almanac {
    * @param  {String} path - object
    * @return {Promise} a promise which will resolve with the fact computation.
    */
-  factValue (factId, params = {}, path = '') {
+  factValue<T>(factId: string, params: Record<string, any> = {}, path: string = ''): Promise<T> {
     let factValuePromise
     const fact = this._getFact(factId)
     if (fact === undefined) {

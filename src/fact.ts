@@ -1,13 +1,84 @@
 'use strict'
 
 import hash from 'hash-it'
+import { DynamicFactCallback, FactOptions, Fact as FactClass } from '../types'
 
-class Fact {
-  id
-  type
-  priority
-  options
+interface FactBase {
+  id: string
+  type: 'CONSTANT' | 'DYNAMIC'
+  priority: number
+  options: FactOptions
+  isConstant(): boolean
+  isDynamic(): boolean
+}
+
+class DynamicFact<T = unknown> implements FactBase, FactClass<T> {
+  type = 'DYNAMIC' as const
+  constructor(
+    public id: string,
+    public calculationMethod: DynamicFactCallback<T>,
+    public options: FactOptions,
+    public priority: number
+  ){
+
+  }
+  isConstant(): boolean {
+    return false;
+  }
+  isDynamic(): boolean {
+    return true;
+  }
+}
+
+class ConstantFact<T> implements FactBase {
+  type = 'CONSTANT' as const
+  constructor(
+    public id: string,
+    public value: T,
+    public options: FactOptions,
+    public priority: number
+  ){
+
+  }
+  isConstant(): boolean {
+    return true;
+  }
+  isDynamic(): boolean {
+    return false;
+  }
+}
+
+class Fact<T = unknown> implements FactClass<T>{
+  private factBase: FactBase;
   cacheKeyMethod
+
+  get id(): string{
+    return this.factBase.id;
+  }
+
+  get options(): FactOptions {
+    return this.factBase.options;
+  }
+
+  get priority(): number {
+    return this.factBase.priority;
+  }
+
+  get value(): T {
+    if(this.factBase instanceof ConstantFact){
+      return this.factBase.value;
+    }
+  }
+
+  get calculationMethod(): DynamicFactCallback<T> | undefined {
+    if(this.factBase instanceof DynamicFact){
+      return this.factBase.calculationMethod
+    }
+  }
+
+  get type(): 'CONSTANT' | 'DYNAMIC' {
+    return this.factBase.type;
+  }
   /**
    * Returns a new fact instance
    * @param  {string} id - fact unique identifer
@@ -16,34 +87,38 @@ class Fact {
    * @param  {primitive|function} valueOrMethod - constant primitive, or method to call when computing the fact's value
    * @return {Fact}
    */
-  constructor (id, valueOrMethod, options?) {
-    this.id = id
+  constructor (id: string, valueOrMethod: T | DynamicFactCallback<T>, options?: FactOptions) {
     const defaultOptions = { cache: true }
+    if (!id) throw new Error('factId required')
     if (typeof options === 'undefined') {
       options = defaultOptions
     }
-    if (typeof valueOrMethod !== 'function') {
-      (this as any).value = valueOrMethod
-      this.type = Fact.CONSTANT
-    } else {
-      (this as any).calculationMethod = valueOrMethod
-      this.type = Fact.DYNAMIC
-    }
-
-    if (!this.id) throw new Error('factId required')
-
-    this.priority = parseInt(options.priority || 1, 10)
-    this.options = Object.assign({}, defaultOptions, options)
+    const priority = (typeof options.priority === 'string' ? parseInt(options.priority, 10) : options.priority) || 1;
+    const fullOptions = Object.assign({}, defaultOptions, options)
     this.cacheKeyMethod = this.defaultCacheKeys
-    return this
+    if (typeof valueOrMethod !== 'function') {
+      this.factBase = new ConstantFact(
+        id,
+        valueOrMethod,
+        fullOptions,
+        priority
+      )
+    } else {
+      this.factBase = new DynamicFact(
+        id,
+        valueOrMethod as DynamicFactCallback<T>,
+        fullOptions,
+        priority
+      )
+    }
   }
 
   isConstant () {
-    return this.type === Fact.CONSTANT
+    return this.factBase.isConstant();
   }
 
   isDynamic () {
-    return this.type === Fact.DYNAMIC
+    return this.factBase.isDynamic();
   }
 
   /**
@@ -52,14 +127,15 @@ class Fact {
    * @param  {Almanac} almanac
    * @return {any} calculation method results
    */
-  calculate()
-  calculate (params, almanac)
-  calculate (params?, almanac?) {
-    // if constant fact w/set value, return immediately
-    if (Object.prototype.hasOwnProperty.call(this, 'value')) {
-      return (this as any).value
+  calculate(): T
+  calculate (params, almanac): T
+  calculate (params?, almanac?): T {
+    if(this.factBase instanceof DynamicFact){
+      return this.factBase.calculationMethod(params, almanac);
     }
-    return (this as any).calculationMethod(params, almanac)
+    if(this.factBase instanceof ConstantFact){
+      return this.factBase.value;
+    }
   }
 
   /**
@@ -90,8 +166,8 @@ class Fact {
    * @return {string} cache key
    */
   getCacheKey (params) {
-    if (this.options.cache === true) {
-      const cacheProperties = this.cacheKeyMethod(this.id, params)
+    if (this.factBase.options.cache === true) {
+      const cacheProperties = this.cacheKeyMethod(this.factBase.id, params)
       const hash = Fact.hashFromObject(cacheProperties)
       return hash
     }

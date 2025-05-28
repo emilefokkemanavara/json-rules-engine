@@ -9,12 +9,29 @@ import defaultDecorators from './engine-default-operator-decorators'
 import debug from './debug'
 import Condition from './condition'
 import OperatorMap from './operator-map'
+import { 
+  EngineOptions,
+  RuleProperties,
+  TopLevelCondition,
+  Rule as RuleClass,
+  Operator as OperatorClass,
+  OperatorEvaluator,
+  OperatorDecorator as OperatorDecoratorClass,
+  OperatorDecoratorEvaluator,
+  DynamicFactCallback,
+  FactOptions,
+  Fact as FactClass,
+  RunOptions,
+  EngineResult,
+  Engine as EngineClass,
+  EventHandler
+} from '../types'
 
 export const READY = 'READY'
 export const RUNNING = 'RUNNING'
 export const FINISHED = 'FINISHED'
 
-class Engine extends EventEmitter {
+class Engine extends EventEmitter implements EngineClass {
   rules
   allowUndefinedFacts
   allowUndefinedConditions
@@ -29,7 +46,7 @@ class Engine extends EventEmitter {
    * Returns a new Engine instance
    * @param  {Rule[]} rules - array of rules to initialize with
    */
-  constructor (rules = [], options: any = {}) {
+  constructor (rules: RuleProperties[] = [], options: EngineOptions = {}) {
     super()
     this.rules = []
     this.allowUndefinedFacts = options.allowUndefinedFacts || false
@@ -54,7 +71,7 @@ class Engine extends EventEmitter {
    * @param {string} properties.event.params - parameters to pass to the event listener
    * @param {Object} properties.conditions - conditions to evaluate when processing this rule
    */
-  addRule (properties) {
+  addRule (properties: RuleProperties): this {
     if (!properties) throw new Error('Engine: addRule() requires options')
 
     let rule
@@ -75,7 +92,7 @@ class Engine extends EventEmitter {
    * update a rule in the engine
    * @param {object|Rule} rule - rule definition. Must be a instance of Rule
    */
-  updateRule (rule) {
+  updateRule (rule: RuleClass): void {
     const ruleIndex = this.rules.findIndex(ruleInEngine => ruleInEngine.name === rule.name)
     if (ruleIndex > -1) {
       this.rules.splice(ruleIndex, 1)
@@ -90,9 +107,9 @@ class Engine extends EventEmitter {
    * Remove a rule from the engine
    * @param {object|Rule|string} rule - rule definition. Must be a instance of Rule
    */
-  removeRule (rule) {
+  removeRule (rule: RuleClass | string): boolean {
     let ruleRemoved = false
-    if (!(rule instanceof Rule)) {
+    if (typeof rule === 'string') {
       const filteredRules = this.rules.filter(ruleInEngine => ruleInEngine.name !== rule)
       ruleRemoved = filteredRules.length !== this.rules.length
       this.rules = filteredRules
@@ -114,7 +131,7 @@ class Engine extends EventEmitter {
    * @param {string} name - the name of the condition to be referenced by rules.
    * @param {object} conditions - the conditions to use when the condition is referenced.
    */
-  setCondition (name, conditions) {
+  public setCondition (name: string, conditions: TopLevelCondition) {
     if (!name) throw new Error('Engine: setCondition() requires name')
     if (!conditions) throw new Error('Engine: setCondition() requires conditions')
     if (!Object.prototype.hasOwnProperty.call(conditions, 'all') && !Object.prototype.hasOwnProperty.call(conditions, 'any') && !Object.prototype.hasOwnProperty.call(conditions, 'not') && !Object.prototype.hasOwnProperty.call(conditions, 'condition')) {
@@ -129,7 +146,7 @@ class Engine extends EventEmitter {
    * @param {string} name - the name of the condition to remove.
    * @returns true if the condition existed, otherwise false
    */
-  removeCondition (name) {
+  removeCondition(name: string): boolean {
     return this.conditions.delete(name)
   }
 
@@ -138,7 +155,12 @@ class Engine extends EventEmitter {
    * @param {string}   operatorOrName - operator identifier within the condition; i.e. instead of 'equals', 'greaterThan', etc
    * @param {function(factValue, jsonValue)} callback - the method to execute when the operator is encountered.
    */
-  addOperator (operatorOrName, cb?: Function) {
+  addOperator(operator: OperatorClass): void;
+  addOperator<A, B>(
+    operatorName: string,
+    callback: OperatorEvaluator<A, B>
+  ): void;
+  addOperator<A, B>(operatorOrName: string | OperatorClass, cb?: OperatorEvaluator<A, B>) {
     this.operators.addOperator(operatorOrName, cb)
   }
 
@@ -146,7 +168,7 @@ class Engine extends EventEmitter {
    * Remove a custom operator definition
    * @param {string}   operatorOrName - operator identifier within the condition; i.e. instead of 'equals', 'greaterThan', etc
    */
-  removeOperator (operatorOrName) {
+  removeOperator(operatorOrName: OperatorClass | string): boolean {
     return this.operators.removeOperator(operatorOrName)
   }
 
@@ -155,7 +177,9 @@ class Engine extends EventEmitter {
    * @param {string}   decoratorOrName - decorator identifier within the condition; i.e. instead of 'someFact', 'everyValue', etc
    * @param {function(factValue, jsonValue, next)} callback - the method to execute when the decorator is encountered.
    */
-  addOperatorDecorator (decoratorOrName, cb?: Function) {
+  addOperatorDecorator(decorator: OperatorDecoratorClass): void;
+  addOperatorDecorator<A, B, NextA, NextB>(decoratorName: string, callback: OperatorDecoratorEvaluator<A, B, NextA, NextB>): void;
+  addOperatorDecorator<A, B, NextA, NextB>(decoratorOrName: string | OperatorDecoratorClass, cb?: OperatorDecoratorEvaluator<A, B, NextA, NextB>) {
     this.operators.addOperatorDecorator(decoratorOrName, cb)
   }
 
@@ -163,7 +187,7 @@ class Engine extends EventEmitter {
    * Remove a custom operator decorator
    * @param {string}   decoratorOrName - decorator identifier within the condition; i.e. instead of 'someFact', 'everyValue', etc
    */
-  removeOperatorDecorator (decoratorOrName) {
+  removeOperatorDecorator(decoratorOrName: OperatorDecoratorClass | string): boolean {
     return this.operators.removeOperatorDecorator(decoratorOrName)
   }
 
@@ -173,14 +197,21 @@ class Engine extends EventEmitter {
    * @param {function} definitionFunc - function to be called when computing the fact value for a given rule
    * @param {Object=} options - options to initialize the fact with. used when "id" is not a Fact instance
    */
-  addFact (id, valueOrMethod, options: any = {}) {
-    let factId = id
-    let fact
+  addFact<T>(fact: FactClass<T>): this;
+  addFact<T>(
+    id: string,
+    valueCallback: DynamicFactCallback<T> | T,
+    options?: FactOptions
+  ): this;
+  addFact<T>(id: string | FactClass<T>, valueOrMethod?: DynamicFactCallback<T> | T, options: FactOptions = {}): this {
+    let factId: string
+    let fact: Fact
     if (id instanceof Fact) {
       factId = id.id
       fact = id
-    } else {
+    } else if(typeof id === 'string'){
       fact = new Fact(id, valueOrMethod, options)
+      factId = id;
     }
     debug('engine::addFact', { id: factId })
     this.facts.set(factId, fact)
@@ -191,7 +222,7 @@ class Engine extends EventEmitter {
    * Remove a fact definition to the engine.  Facts are called by rules as they are evaluated.
    * @param {object|Fact} id - fact identifier or instance of Fact
    */
-  removeFact (factOrId) {
+  removeFact(factOrId: string | Fact): boolean {
     let factId
     if (!(factOrId instanceof Fact)) {
       factId = factOrId
@@ -229,7 +260,7 @@ class Engine extends EventEmitter {
    * the same priority may still emit events, even though the engine is in a "finished" state.
    * @return {Engine}
    */
-  stop () {
+  stop (): this {
     this.status = FINISHED
     return this
   }
@@ -239,7 +270,7 @@ class Engine extends EventEmitter {
    * @param  {string} factId - fact identifier
    * @return {Fact} fact instance, or undefined if no such fact exists
    */
-  getFact (factId) {
+  getFact<T>(factId: string): FactClass<T> {
     return this.facts.get(factId)
   }
 
@@ -275,11 +306,11 @@ class Engine extends EventEmitter {
    * @param  {Object} runOptions - run options
    * @return {Promise} resolves when the engine has completed running
    */
-  run (runtimeFacts = {}, runOptions: any = {}) {
+  run (runtimeFacts: Record<string, any> = {}, runOptions: RunOptions = {}): Promise<EngineResult> {
     debug('engine::run started')
     this.status = RUNNING
 
-    const almanac = runOptions.almanac || new Almanac({
+    const almanac = (runOptions.almanac as Almanac) || new Almanac({
       allowUndefinedFacts: this.allowUndefinedFacts,
       pathResolver: this.pathResolver
     })
@@ -328,6 +359,11 @@ class Engine extends EventEmitter {
         })
       }).catch(reject)
     })
+  }
+
+  on<T = Event>(eventName: string, handler: EventHandler<T>): this {
+    super.on(eventName, handler);
+    return this;
   }
 }
 

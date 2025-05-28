@@ -1,9 +1,10 @@
 'use strict'
 
+import { ConditionProperties, TopLevelCondition } from '../types'
 import debug from './debug'
 
 export default class Condition {
-  constructor (properties) {
+  constructor (properties: ConditionProperties | TopLevelCondition) {
     if (!properties) throw new Error('Condition: constructor options required')
     const booleanOperator = Condition.booleanOperator(properties)
     Object.assign(this, properties)
@@ -14,7 +15,7 @@ export default class Condition {
       if (booleanOperator === 'not' && subConditionsIsArray) { throw new Error(`"${booleanOperator}" cannot be an array`) }
       this['operator'] = booleanOperator
       // boolean conditions always have a priority; default 1
-      this['priority'] = parseInt(properties.priority, 10) || 1
+      this['priority'] = (typeof properties.priority == 'string' ? parseInt(properties.priority, 10): properties.priority) || 1
       if (subConditionsIsArray) {
         this[booleanOperator] = subConditions.map((c) => new Condition(c))
       } else {
@@ -28,7 +29,7 @@ export default class Condition {
       // a non-boolean condition does not have a priority by default. this allows
       // priority to be dictated by the fact definition
       if (Object.prototype.hasOwnProperty.call(properties, 'priority')) {
-        properties.priority = parseInt(properties.priority, 10)
+        properties.priority = typeof properties.priority === 'string' ? parseInt(properties.priority, 10) : properties.priority;
       }
     }
   }

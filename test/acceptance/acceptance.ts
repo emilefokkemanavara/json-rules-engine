@@ -114,7 +114,7 @@ describe('Acceptance', () => {
       event: event2
     })
 
-    engine.addOperator('containsDivisibleValuesOf', (factValue, jsonValue) => {
+    engine.addOperator<number[], number>('containsDivisibleValuesOf', (factValue, jsonValue) => {
       return factValue.some(v => v % jsonValue === 0)
     })
 
@@ -126,7 +126,7 @@ describe('Acceptance', () => {
 
     engine.addFact('low-priority', async function (params, almanac) {
       lowPrioritySpy(params)
-      const idx = await almanac.factValue('sub-fact')
+      const idx: number = await almanac.factValue('sub-fact')
       return delay(idx + 1) // baseIndex + 1
     }, { priority: 1 })
 

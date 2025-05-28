@@ -3,6 +3,7 @@
 import Engine from '../src/index'
 import Rule from '../src/rule'
 import sinon from 'sinon'
+import { RuleProperties } from '../types'
 
 describe('Rule', () => {
   const rule = new Rule()
@@ -73,7 +74,7 @@ describe('Rule', () => {
         expect(e).to.equal(event)
         done()
       }
-      const rule = new Rule({ onSuccess })
+      const rule = new Rule({ onSuccess } as unknown as RuleProperties)
       rule.emit('success', event)
     })
 
@@ -83,7 +84,7 @@ describe('Rule', () => {
         expect(e).to.equal(event)
         done()
       }
-      const rule = new Rule({ onFailure })
+      const rule = new Rule({ onFailure } as unknown as RuleProperties)
       rule.emit('failure', event)
     })
   })
@@ -94,7 +95,7 @@ describe('Rule', () => {
     })
 
     it('throws if argument is missing "type" property', () => {
-      expect(() => rule.setEvent({})).to.throw(/Rule: setEvent\(\) requires event object with "type" property/)
+      expect(() => rule.setEvent({} as any)).to.throw(/Rule: setEvent\(\) requires event object with "type" property/)
     })
   })
 
@@ -104,7 +105,7 @@ describe('Rule', () => {
     })
 
     it('throws if argument is missing "type" property', () => {
-      expect(() => rule.setEvent({})).to.throw(/Rule: setEvent\(\) requires event object with "type" property/)
+      expect(() => rule.setEvent({} as any)).to.throw(/Rule: setEvent\(\) requires event object with "type" property/)
     })
   })
 

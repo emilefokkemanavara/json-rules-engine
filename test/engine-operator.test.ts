@@ -35,7 +35,7 @@ describe('Engine: operator', () => {
     const engine = engineFactory()
     const rule = factories.rule({ conditions, event })
     engine.addRule(rule)
-    engine.addOperator('startsWithLetter', (factValue, jsonValue) => {
+    engine.addOperator<string, string>('startsWithLetter', (factValue, jsonValue) => {
       if (!factValue.length) return false
       return factValue[0].toLowerCase() === jsonValue.toLowerCase()
     })
