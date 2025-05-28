@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "module": "CommonJS",
+        "target": "ESNext",
+        "composite": true,
+        "emitDeclarationOnly": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "types": []
+    },
+    "include": [],
+    "references": [
+        {"path": "./src"},
+        {"path": "./test"},
+        {"path": "./tsconfig.types.json"},
+        {"path": "./examples"}
+    ]
+}

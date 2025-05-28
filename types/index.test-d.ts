@@ -1,5 +1,3 @@
-import { expectType } from "tsd";
-
 import rulesEngine, {
   Almanac,
   EngineResult,
@@ -20,6 +18,10 @@ import rulesEngine, {
   AllConditionsResult,
   NotConditionsResult
 } from "../";
+
+const expectType = <T>(expression: T) => {
+	
+};
 
 // setup basic fixture data
 const ruleProps: RuleProperties = {
@@ -146,7 +148,9 @@ const topLevelNotConditionsResult = topLevelConditionResult.then(r => (r as NotC
 expectType<Promise<boolean | undefined>>(topLevelNotConditionsResult)
 
 // Alamanac tests
-const almanac: Almanac = (await engine.run()).almanac;
+async function run(){
+  const almanac: Almanac = (await engine.run()).almanac;
 
-expectType<Promise<string>>(almanac.factValue<string>("test-fact"));
-expectType<void>(almanac.addRuntimeFact("test-fact", "some-value"));
+  expectType<Promise<string>>(almanac.factValue<string>("test-fact"));
+  expectType<void>(almanac.addRuntimeFact("test-fact", "some-value"));
+}

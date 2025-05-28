@@ -12,4 +12,4 @@ npm run build
 npm link
 cd $THIS_DIR/../../examples # examples directory
 npm link json-rules-engine
-for i in *.js; do node $i; done;
+for i in *.ts; do ts-node $i; done;

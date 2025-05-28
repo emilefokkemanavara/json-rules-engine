@@ -9,6 +9,6 @@ chai.use(sinonChai)
 chai.use(dirtyChai)
 global.expect = chai.expect
 global.factories = {
-  rule: require('./rule-factory'),
-  condition: require('./condition-factory')
+  rule: require('./rule-factory').default,
+  condition: require('./condition-factory').default
 }
